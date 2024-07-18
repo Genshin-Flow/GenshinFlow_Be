@@ -5,9 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class GenshinflowApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(GenshinflowApplication.class, args);
 	}
-	// 푸쉬 테스트
 }
