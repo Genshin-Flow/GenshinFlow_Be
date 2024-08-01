@@ -3,7 +3,9 @@ package com.next.genshinflow.domain.entity;
 import com.next.genshinflow.domain.BaseEntity;
 import com.next.genshinflow.enumeration.AccountStatus;
 import com.next.genshinflow.enumeration.Role;
+import com.next.genshinflow.enumeration.converter.AccountStatusConverter;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -39,6 +41,7 @@ public class MemberEntity extends BaseEntity {
     @Column
     private String image;
 
+    @Convert(converter = AccountStatusConverter.class)
     @Column
     private AccountStatus status;
 

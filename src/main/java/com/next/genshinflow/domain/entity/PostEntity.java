@@ -4,6 +4,8 @@ import com.next.genshinflow.domain.BaseEntity;
 import com.next.genshinflow.domain.LocalDateTimeAttributeConverter;
 import com.next.genshinflow.enumeration.QuestCategory;
 import com.next.genshinflow.enumeration.Region;
+import com.next.genshinflow.enumeration.converter.QuestCategoryConverter;
+import com.next.genshinflow.enumeration.converter.RegionConverter;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -35,9 +37,11 @@ public class PostEntity extends BaseEntity {
     @Column
     private Long uid;
 
+    @Convert(converter = RegionConverter.class)
     @Column
     private Region region;
 
+    @Convert(converter = QuestCategoryConverter.class)
     @Column
     private QuestCategory questCategory;
 
