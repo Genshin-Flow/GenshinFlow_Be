@@ -57,10 +57,6 @@ public class PostEntity extends BaseEntity {
     @Column(name = "is_deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT false")
     private boolean deleted;
 
-    @Column(name = "is_request", nullable = false, columnDefinition = "BOOLEAN DEFAULT false")
-    @Comment("요청글인지 여부")
-    private boolean request;
-
     @Convert(converter = LocalDateTimeAttributeConverter.class)
     @Column
     private LocalDateTime completedAt;
