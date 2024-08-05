@@ -54,10 +54,10 @@ public class PostEntity extends BaseEntity {
     @Column
     private String password;
 
-    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT false")
+    @Column(name = "is_deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT false")
     private boolean deleted;
 
-    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT false")
+    @Column(name = "is_request", nullable = false, columnDefinition = "BOOLEAN DEFAULT false")
     @Comment("요청글인지 여부")
     private boolean request;
 
