@@ -12,7 +12,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
-import org.hibernate.annotations.Comment;
 
 @Getter
 @Entity
@@ -31,12 +30,7 @@ public class MemberEntity extends BaseEntity {
     private String email;
 
     @Column
-    @Comment("writer 가 없을 경우 사용하는 password 해시값")
     private String password;
-
-    @Column
-    @Comment("password hash 생성 시 사용한 salt 값")
-    private String salt;
 
     @Column
     private String image;

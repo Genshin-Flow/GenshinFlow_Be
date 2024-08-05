@@ -52,12 +52,7 @@ public class PostEntity extends BaseEntity {
     private String content;
 
     @Column
-    @Comment("writer 가 없을 경우 사용하는 password 해시값")
     private String password;
-
-    @Column
-    @Comment("password hash 생성 시 사용한 salt 값")
-    private String salt;
 
     @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT false")
     private boolean deleted;
