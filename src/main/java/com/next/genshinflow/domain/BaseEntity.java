@@ -12,7 +12,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public class BaseEntity implements Serializable {
+public abstract class BaseEntity implements Serializable {
 
     @Convert(converter = LocalDateTimeAttributeConverter.class)
     @Column(name = "created_at", nullable = false, updatable = false)
