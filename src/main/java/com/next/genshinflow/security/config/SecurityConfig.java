@@ -1,5 +1,6 @@
 package com.next.genshinflow.security.config;
 
+import com.next.genshinflow.enumeration.Role;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -46,8 +47,8 @@ public class SecurityConfig {
             )
             // URL 인가 설정
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/admin/**").hasRole("ADMIN")
-                .requestMatchers("/member/my-page").hasRole("USER")
+                .requestMatchers("/admin/**").hasRole(Role.ADMIN.getRole())
+                .requestMatchers("/member/my-page").hasRole(Role.USER.getRole())
                 .anyRequest().permitAll()
             );
         return http.build();
@@ -58,13 +59,13 @@ public class SecurityConfig {
         UserDetails user = User.builder()
                 .username("user@gmail.com")
                 .password("1234")
-                .roles("USER")
+                .roles(Role.ADMIN.getRole())
                 .build();
 
         UserDetails admin = User.builder()
             .username("admin@gmail.com")
             .password("4321")
-            .roles("ADMIN")
+            .roles(Role.USER.getRole())
             .build();
 
         return new InMemoryUserDetailsManager(user, admin);
