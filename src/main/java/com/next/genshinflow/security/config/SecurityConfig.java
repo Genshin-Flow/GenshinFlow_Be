@@ -55,23 +55,6 @@ public class SecurityConfig {
     }
 
     @Bean
-    public UserDetailsManager userDetailsService() {
-        UserDetails user = User.builder()
-                .username("user@gmail.com")
-                .password("1234")
-                .roles(Role.ADMIN.getRole())
-                .build();
-
-        UserDetails admin = User.builder()
-            .username("admin@gmail.com")
-            .password("4321")
-            .roles(Role.USER.getRole())
-            .build();
-
-        return new InMemoryUserDetailsManager(user, admin);
-    }
-
-    @Bean
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
