@@ -1,0 +1,7 @@
+users:
+  - username: user@gmail.com
+    password: testUser
+    roles: USER
+  - username: admin@gmail.com
+    password: testAdmin
+    roles: ADMIN
