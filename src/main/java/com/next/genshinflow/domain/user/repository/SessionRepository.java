@@ -1,6 +1,6 @@
-package com.next.genshinflow.domain.repository;
+package com.next.genshinflow.domain.user.repository;
 
-import com.next.genshinflow.domain.entity.SessionEntity;
+import com.next.genshinflow.domain.user.entity.SessionEntity;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

@@ -1,4 +1,4 @@
-package com.next.genshinflow.domain.entity;
+package com.next.genshinflow.domain.user.entity;
 
 import com.next.genshinflow.domain.BaseEntity;
 import com.next.genshinflow.enumeration.AccountStatus;

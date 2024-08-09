@@ -1,4 +1,4 @@
-package com.next.genshinflow.domain.repository;
+package com.next.genshinflow.domain.user.repository;
 
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.data.jpa.repository.JpaRepository;

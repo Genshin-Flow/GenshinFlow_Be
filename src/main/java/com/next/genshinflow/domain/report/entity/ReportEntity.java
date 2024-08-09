@@ -1,6 +1,7 @@
-package com.next.genshinflow.domain.entity;
+package com.next.genshinflow.domain.report.entity;
 
 import com.next.genshinflow.domain.BaseEntity;
+import com.next.genshinflow.domain.user.entity.MemberEntity;
 import com.next.genshinflow.enumeration.ReportStatus;
 import com.next.genshinflow.enumeration.converter.ReportStatusConverter;
 import jakarta.persistence.Column;
