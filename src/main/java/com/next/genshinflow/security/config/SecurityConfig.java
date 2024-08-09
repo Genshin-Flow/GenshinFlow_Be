@@ -46,7 +46,7 @@ public class SecurityConfig {
             )
             // URL 인가 설정
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/admin/***").hasRole("ADMIN")
+                .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/member/my-page").hasRole("USER")
                 .anyRequest().permitAll()
             );
