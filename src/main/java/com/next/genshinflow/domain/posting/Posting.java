@@ -1,4 +1,4 @@
-package com.next.genshinflow.domain.posting.entity;
+package com.next.genshinflow.domain.posting;
 
 import com.next.genshinflow.domain.BaseEntity;
 import com.next.genshinflow.domain.LocalDateTimeAttributeConverter;
@@ -16,12 +16,16 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.Comment;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "posting")
 @Comment("메인 대시보드 posting")
-public class PostingEntity extends BaseEntity {
+public class Posting extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,6 +58,9 @@ public class PostingEntity extends BaseEntity {
 
     @Column
     private String password;
+
+    @Column
+    private String passwordSalt;
 
     @Column(name = "is_deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT false")
     private boolean deleted;
