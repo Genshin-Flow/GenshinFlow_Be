@@ -18,9 +18,10 @@ public class PasswordUtils {
         String salt = BCrypt.gensalt();
         String encodedValue = BCrypt.hashpw(String.valueOf(password), salt);
 
-        return new HashedPassword()
-            .setSalt(salt)
-            .setEncodedPassword(encodedValue);
+        return new HashedPassword(
+            encodedValue,
+            salt
+        );
     }
 
     public static HashedPassword hashWithSalt(String password) {
@@ -31,9 +32,10 @@ public class PasswordUtils {
         String salt = BCrypt.gensalt();
         String encodedValue = BCrypt.hashpw(password, salt);
 
-        return new HashedPassword()
-            .setSalt(salt)
-            .setEncodedPassword(encodedValue);
+        return new HashedPassword(
+            encodedValue,
+            salt
+        );
     }
 
     public static boolean verifyIfPasswordMatches(
