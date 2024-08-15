@@ -17,7 +17,9 @@ public record PostingResponse(
     @Schema(description = "마지막 변경 일시", type = "LocalDateTime", example = "2024-08-12 01:12:00")
     LocalDateTime lastUpdatedAt,
     @Schema(description = "등록일시", type = "LocalDateTime", example = "2024-08-12 01:12:00")
-    LocalDateTime registeredAt
+    LocalDateTime registeredAt,
+    @Schema(description = "수정 가능한 포스팅인가(작성자가 본인인가)", type = "boolean", example = "false")
+    boolean editable
 ) {
 
 }
