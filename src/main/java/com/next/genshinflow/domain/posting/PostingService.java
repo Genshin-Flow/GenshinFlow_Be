@@ -19,7 +19,9 @@ public class PostingService {
 
     public Page<Posting> getDashboardPostings(Pageable pageable) {
         return postingRepository.findAllByDeletedFalseAndCompletedAtAfterOrderByUpdatedAtDesc(
-            pageable);
+            LocalDateTime.now(),
+            pageable
+        );
     }
 
     public Posting getPostingById(long postingId) {
@@ -56,7 +58,12 @@ public class PostingService {
     public void deleteNonMemberPosting(long postingId) {
         postingRepository.findById(postingId)
             .map(posting -> posting.setDeleted(true))
-            .orElseThrow(() -> new BusinessLogicException(ExceptionCode.POSTING_NOT_FOUND));
+            .ifPresentOrElse(
+                postingRepository::save,
+                () -> {
+                    throw new BusinessLogicException(ExceptionCode.POSTING_NOT_FOUND);
+                }
+            );
     }
 
     @Transactional
@@ -64,7 +71,12 @@ public class PostingService {
         postingRepository.findById(postingId)
             .filter(posting -> this.isWriter(accountId, posting))
             .map(posting -> posting.setDeleted(true))
-            .orElseThrow(() -> new BusinessLogicException(ExceptionCode.POSTING_NOT_FOUND));
+            .ifPresentOrElse(
+                postingRepository::save,
+                () -> {
+                    throw new BusinessLogicException(ExceptionCode.POSTING_NOT_FOUND);
+                }
+            );
     }
 
     private boolean isWriter(long accountId, Posting posting) {

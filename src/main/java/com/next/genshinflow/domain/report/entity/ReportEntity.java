@@ -10,6 +10,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
@@ -23,11 +24,11 @@ public class ReportEntity extends BaseEntity {
     private Long id;
 
     @ManyToOne
-    @Column
+    @JoinColumn(name = "reporter_id")
     private MemberEntity reporter;
 
     @ManyToOne
-    @Column
+    @JoinColumn(name = "reportee_id")
     private MemberEntity reportee;
 
     @Column
