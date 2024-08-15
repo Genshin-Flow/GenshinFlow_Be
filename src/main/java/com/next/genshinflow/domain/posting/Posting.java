@@ -17,11 +17,15 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.hibernate.annotations.Comment;
 
+@Accessors(chain = true)
 @Getter
 @Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "posting")
 @Comment("메인 대시보드 posting")
