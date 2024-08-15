@@ -4,6 +4,8 @@ import com.next.genshinflow.exception.BusinessLogicException;
 import com.next.genshinflow.exception.ExceptionCode;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.Objects;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +35,9 @@ public class PostingService {
     @Transactional
     public Posting modifyPosting(Posting posting) {
         Posting source = postingRepository.findById(posting.getId())
+            .filter(it -> Optional.ofNullable(it.getWriter())
+                .filter(writer -> Objects.equals(writer.getId(), posting.getWriter().getId()))
+                .isPresent())
             .orElseThrow(() -> new BusinessLogicException(ExceptionCode.POSTING_NOT_FOUND));
         posting.setId(source.getId());
         posting.setDeleted(false);

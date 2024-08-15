@@ -72,18 +72,20 @@ public class PostingController implements PostingAPI {
 
     @PutMapping(value = "/modify", headers = LOGIN_HEADER)
     public ResponseEntity<PostingResponse> modifyRequestByNonMember(
-        @RequestBody PostingModifyRequest postingModifyRequest
+        @RequestBody PostingModifyRequest request
     ) {
-        return null;
+        PostingResponse response = postingAppService.modifyNonMemberPosting(request);
+        return ResponseEntity.ok(response);
     }
 
     @UserAuth
     @PutMapping(value = "/modify", headers = NO_LOGIN_HEADER)
     public ResponseEntity<PostingResponse> modifyRequestByUser(
-        @AuthenticationPrincipal MemberResponse memberResponse,
-        @RequestBody PostingModifyRequest postingModifyRequest
+        @AuthenticationPrincipal MemberResponse member,
+        @RequestBody PostingModifyRequest request
     ) {
-        return null;
+        PostingResponse response = postingAppService.modifyMemberPosting(request, member);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping(value = "/delete", headers = LOGIN_HEADER)

@@ -38,7 +38,7 @@ public class PasswordUtils {
         );
     }
 
-    public static boolean verifyIfPasswordMatches(
+    public static void verifyPasswordMatches(
         String password,
         String encodedPassword,
         String salt
@@ -48,10 +48,15 @@ public class PasswordUtils {
         }
 
         String target = BCrypt.hashpw(password, salt);
-        return StringUtils.equals(target, encodedPassword);
+
+        if (StringUtils.equals(target, encodedPassword)) {
+            return;
+        }
+
+        throw new BusinessLogicException(ExceptionCode.INVALID_PASSWORD);
     }
 
-    public static boolean verifyIfPasswordMatches(
+    public static void verifyPasswordMatches(
         int password,
         String encodedPassword,
         String salt
@@ -61,7 +66,12 @@ public class PasswordUtils {
         }
 
         String target = BCrypt.hashpw(String.valueOf(password), salt);
-        return StringUtils.equals(target, encodedPassword);
+
+        if (StringUtils.equals(target, encodedPassword)) {
+            return;
+        }
+
+        throw new BusinessLogicException(ExceptionCode.INVALID_PASSWORD);
     }
 
     private static boolean isNotProperPassword(String password) {

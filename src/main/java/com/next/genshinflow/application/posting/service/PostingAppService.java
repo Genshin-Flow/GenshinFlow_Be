@@ -3,6 +3,7 @@ package com.next.genshinflow.application.posting.service;
 import com.next.genshinflow.application.PageResponse;
 import com.next.genshinflow.application.posting.mapper.PostingMapper;
 import com.next.genshinflow.application.posting.request.PostingCreateRequest;
+import com.next.genshinflow.application.posting.request.PostingModifyRequest;
 import com.next.genshinflow.application.posting.response.PostingResponse;
 import com.next.genshinflow.application.user.response.MemberResponse;
 import com.next.genshinflow.domain.posting.Posting;
@@ -66,6 +67,35 @@ public class PostingAppService {
 
         Posting posting = PostingMapper.from(request, writer, HashedPassword.EMPTY);
         Posting savedPosting = postingService.createPosting(posting);
+
+        return PostingMapper.toResponse(savedPosting, true);
+    }
+
+    @Transactional
+    public PostingResponse modifyNonMemberPosting(
+        PostingModifyRequest request
+    ) {
+        HashedPassword hashedPassword = postingService.getPostingById(request.id())
+            .getHashedPassword();
+        PasswordUtils.verifyPasswordMatches(
+            request.password(), hashedPassword.encodedPassword(), hashedPassword.salt());
+
+        Posting posting = PostingMapper.from(request, null, hashedPassword);
+        Posting savedPosting = postingService.modifyPosting(posting);
+
+        return PostingMapper.toResponse(savedPosting, false);
+    }
+
+    @Transactional
+    public PostingResponse modifyMemberPosting(
+        PostingModifyRequest request,
+        MemberResponse member
+    ) {
+        MemberEntity writer = memberRepository.findById(member.id())
+            .orElseThrow(() -> new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND));
+
+        Posting posting = PostingMapper.from(request, writer, HashedPassword.EMPTY);
+        Posting savedPosting = postingService.modifyPosting(posting);
 
         return PostingMapper.toResponse(savedPosting, true);
     }

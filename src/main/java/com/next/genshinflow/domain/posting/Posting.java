@@ -7,6 +7,7 @@ import com.next.genshinflow.enumeration.QuestCategory;
 import com.next.genshinflow.enumeration.Region;
 import com.next.genshinflow.enumeration.converter.QuestCategoryConverter;
 import com.next.genshinflow.enumeration.converter.RegionConverter;
+import com.next.genshinflow.util.HashedPassword;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -76,4 +77,11 @@ public class Posting extends BaseEntity {
     @Convert(converter = LocalDateTimeAttributeConverter.class)
     @Column
     private LocalDateTime completedAt;
+
+    public HashedPassword getHashedPassword() {
+        return new HashedPassword(
+            password,
+            passwordSalt
+        );
+    }
 }
