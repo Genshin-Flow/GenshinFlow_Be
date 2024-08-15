@@ -3,7 +3,7 @@ package com.next.genshinflow.application.posting.response;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public record AssignerResponse(
-    @Schema(description = "유저 postingId", type = "long", example = "1")
+    @Schema(description = "유저 uid", type = "long", example = "1")
     long uid,
     @Schema(description = "닉네임", type = "String", example = "exampleName")
     String nickName,

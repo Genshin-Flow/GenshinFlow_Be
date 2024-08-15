@@ -14,6 +14,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
@@ -34,11 +35,11 @@ public class Posting extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "postingId")
+    @Column(name = "id")
     private Long id;
 
     @ManyToOne
-    @Column
+    @JoinColumn(name = "writer_id")
     private MemberEntity writer;
 
 // TODO: FE 단에서 uid 만 내려줄 때 이름/이미지 가져올 수 있는지 문의할 것

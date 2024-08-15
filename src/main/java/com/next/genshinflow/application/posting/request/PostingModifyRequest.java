@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record PostingModifyRequest(
-    @Schema(description = "변경할 posting 의 postingId", type = "long", example = "1111")
+    @Schema(description = "변경할 posting 의 Id", type = "long", example = "1111")
     long postingId,
     @Schema(description = "등록자의 uid", type = "long", example = "1234567890")
     long uid,
