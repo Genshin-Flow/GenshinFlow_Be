@@ -3,11 +3,7 @@ package com.next.genshinflow.application.posting.request;
 import com.next.genshinflow.enumeration.QuestCategory;
 import com.next.genshinflow.enumeration.Region;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
-@Getter
-@RequiredArgsConstructor
 public record PostingModifyRequest(
     @Schema(description = "원신 서버 지역", type = "Region", example = "ASIA")
     Region region,
