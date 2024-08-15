@@ -1,6 +1,6 @@
 package com.next.genshinflow.application.user.response;
 
-import com.next.genshinflow.enumeration.UserStatus;
+import com.next.genshinflow.enumeration.AccountStatus;
 import com.next.genshinflow.enumeration.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -16,7 +16,7 @@ public record MemberResponse(
     @Schema(description = "프로필 사진", type = "String", example = "example.jpg")
     String profileImg,
     @Schema(description = "유저 상태", type = "enum", example = "1주일 정지, 휴면 계정")
-    UserStatus status,
+    AccountStatus status,
     @Schema(description = "유저 권한", type = "enum", example = "유저 혹은 관리자")
     Role role
 ) {
