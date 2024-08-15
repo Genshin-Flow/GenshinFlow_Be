@@ -4,7 +4,7 @@ package com.next.genshinflow.exception;
 import lombok.Getter;
 
 @Getter
-public abstract class BusinessLogicException extends RuntimeException {
+public class BusinessLogicException extends RuntimeException {
 
     private final ExceptionCode exceptionCode;
 
