@@ -26,7 +26,7 @@ public class MemberEntity extends BaseEntity {
     private Long id;
 
     @Column
-    private String uid;
+    private Long uid;
 
     @Column
     private String name;
