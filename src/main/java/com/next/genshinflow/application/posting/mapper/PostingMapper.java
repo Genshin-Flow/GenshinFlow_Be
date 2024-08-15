@@ -1,19 +1,22 @@
 package com.next.genshinflow.application.posting.mapper;
 
+import com.next.genshinflow.application.posting.request.PostingCreateRequest;
 import com.next.genshinflow.application.posting.response.AssignerResponse;
 import com.next.genshinflow.application.posting.response.PostingResponse;
 import com.next.genshinflow.domain.posting.Posting;
 import com.next.genshinflow.domain.user.entity.MemberEntity;
+import com.next.genshinflow.util.HashedPassword;
+import java.time.LocalDateTime;
 
 public class PostingMapper {
 
     private PostingMapper() {
     }
 
-    public static PostingResponse mapToResponse(Posting posting, boolean editable) {
+    public static PostingResponse toResponse(Posting posting, boolean editable) {
         return new PostingResponse(
             posting.getId(),
-            mapToAssigner(posting),
+            toAssigner(posting),
             posting.getQuestCategory(),
             posting.getWorldLevel(),
             posting.getUpdatedAt(),
@@ -22,7 +25,7 @@ public class PostingMapper {
         );
     }
 
-    private static AssignerResponse mapToAssigner(Posting posting) {
+    private static AssignerResponse toAssigner(Posting posting) {
         if (posting.getWriter() != null) {
             MemberEntity member = posting.getWriter();
             return new AssignerResponse(
@@ -39,5 +42,22 @@ public class PostingMapper {
             null,
             false
         );
+    }
+
+    public static Posting from(
+        PostingCreateRequest request,
+        MemberEntity member,
+        HashedPassword hashedPassword
+    ) {
+        return new Posting()
+            .setWriter(member)
+            .setUid(request.uid())
+            .setRegion(request.region())
+            .setQuestCategory(request.questCategory())
+            .setWorldLevel(request.wordLevel())
+            .setContent(request.content())
+            .setPassword(hashedPassword.encodedPassword())
+            .setPasswordSalt(hashedPassword.salt())
+            .setCompletedAt(LocalDateTime.now().plusHours(request.autoCompleteTime()));
     }
 }

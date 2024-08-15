@@ -6,14 +6,17 @@ import com.next.genshinflow.application.posting.request.PostingDeleteRequest;
 import com.next.genshinflow.application.posting.request.PostingModifyRequest;
 import com.next.genshinflow.application.posting.request.PostingPullUpRequest;
 import com.next.genshinflow.application.posting.response.PostingResponse;
+import com.next.genshinflow.application.posting.service.PostingAppService;
 import com.next.genshinflow.application.user.response.MemberResponse;
 import com.next.genshinflow.auth.UserAuth;
-import java.awt.print.Pageable;
+import java.net.URI;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,28 +32,42 @@ public class PostingController implements PostingAPI {
     private static final String LOGIN_HEADER = "";
     private static final String NO_LOGIN_HEADER = "!" + LOGIN_HEADER;
 
+    private final PostingAppService postingAppService;
 
+    @GetMapping("/{postingId}")
+    public ResponseEntity<PostingResponse> getRequests(
+        @PathVariable long postingId
+    ) {
+        return ResponseEntity.ok(postingAppService.getPosting(postingId));
+    }
+
+    @UserAuth(required = false)
     @GetMapping
     public ResponseEntity<PageResponse<PostingResponse>> getRequests(
+        @AuthenticationPrincipal MemberResponse memberResponse,
         @RequestParam Pageable pageable
     ) {
-        return null;
+        return ResponseEntity.ok(postingAppService.getPostings(memberResponse, pageable));
     }
 
     @PostMapping(value = "/create", headers = LOGIN_HEADER)
     public ResponseEntity<PostingResponse> createRequestByNonMember(
-        @RequestBody PostingCreateRequest postingCreateRequest
+        @RequestBody PostingCreateRequest request
     ) {
-        return null;
+        PostingResponse response = postingAppService.createNonMemberPosting(request);
+        return ResponseEntity.created(URI.create("/" + response.id()))
+            .body(response);
     }
 
     @UserAuth
     @PostMapping(value = "/create", headers = NO_LOGIN_HEADER)
     public ResponseEntity<PostingResponse> createRequestByUser(
-        @AuthenticationPrincipal MemberResponse memberResponse,
-        @RequestBody PostingCreateRequest postingCreateRequest
+        @AuthenticationPrincipal MemberResponse member,
+        @RequestBody PostingCreateRequest request
     ) {
-        return null;
+        PostingResponse response = postingAppService.createMemberPosting(request, member);
+        return ResponseEntity.created(URI.create("/" + response.id()))
+            .body(response);
     }
 
     @PutMapping(value = "/modify", headers = LOGIN_HEADER)

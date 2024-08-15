@@ -1,6 +1,5 @@
 package com.next.genshinflow.application.posting.controller.publicapi;
 
-
 import com.next.genshinflow.application.PageResponse;
 import com.next.genshinflow.application.posting.request.PostingCreateRequest;
 import com.next.genshinflow.application.posting.request.PostingDeleteRequest;
@@ -10,17 +9,24 @@ import com.next.genshinflow.application.posting.response.PostingResponse;
 import com.next.genshinflow.application.user.response.MemberResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.awt.print.Pageable;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Tag(name = "Posting API", description = "포스팅 API")
 public interface PostingAPI {
+
+    @Operation(summary = "포스팅 단건 조회")
+    ResponseEntity<PostingResponse> getRequests(
+        @PathVariable long postingId
+    );
 
     @Operation(
         summary = "포스팅 목록",
         description = "최근 포스팅을 size 개 가져옵니다. 최대개수 : 100"
     )
     ResponseEntity<PageResponse<PostingResponse>> getRequests(
+        MemberResponse memberResponse,
         Pageable pageable
     );
 

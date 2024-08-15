@@ -20,19 +20,25 @@ public class PostingService {
             pageable);
     }
 
-    public Posting findPostingById(long id) {
-        return postingRepository.findById(id)
+    public Posting getPostingById(long postingId) {
+        return postingRepository.findById(postingId)
             .orElseThrow(() -> new BusinessLogicException(ExceptionCode.POSTING_NOT_FOUND));
     }
 
     @Transactional
-    public Posting createNonMembersPosting() {
-
+    public Posting createPosting(Posting posting) {
+        return postingRepository.save(posting);
     }
 
     @Transactional
-    public Posting modifyPosting(long postingId,) {
+    public Posting modifyPosting(Posting posting) {
+        Posting source = postingRepository.findById(posting.getId())
+            .orElseThrow(() -> new BusinessLogicException(ExceptionCode.POSTING_NOT_FOUND));
+        posting.setId(source.getId());
+        posting.setDeleted(false);
+        posting.setCreatedAt(source.getCreatedAt());
 
+        return postingRepository.save(posting);
     }
 
     @Transactional
