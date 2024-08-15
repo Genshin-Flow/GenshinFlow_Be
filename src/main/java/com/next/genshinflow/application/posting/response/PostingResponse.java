@@ -1,4 +1,4 @@
-package com.next.genshinflow.application.post.response;
+package com.next.genshinflow.application.posting.response;
 
 import com.next.genshinflow.enumeration.QuestCategory;
 import io.swagger.v3.oas.annotations.media.Schema;

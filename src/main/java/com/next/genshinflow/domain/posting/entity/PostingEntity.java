@@ -1,4 +1,4 @@
-package com.next.genshinflow.domain.post.entity;
+package com.next.genshinflow.domain.posting.entity;
 
 import com.next.genshinflow.domain.BaseEntity;
 import com.next.genshinflow.domain.LocalDateTimeAttributeConverter;
@@ -19,9 +19,9 @@ import java.time.LocalDateTime;
 import org.hibernate.annotations.Comment;
 
 @Entity
-@Table(name = "post")
-@Comment("메인 대시보드 post")
-public class PostEntity extends BaseEntity {
+@Table(name = "posting")
+@Comment("메인 대시보드 posting")
+public class PostingEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,7 +1,7 @@
-package com.next.genshinflow.application.post.controller.publicapi;
+package com.next.genshinflow.application.posting.controller.publicapi;
 
 
-import com.next.genshinflow.application.post.response.PostingResponse;
+import com.next.genshinflow.application.posting.response.PostingResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
