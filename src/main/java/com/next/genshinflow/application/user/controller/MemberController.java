@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 
 @RestController
-@RequestMapping("/healthcheck/member")
+@RequestMapping("/member")
 @RequiredArgsConstructor
 public class MemberController {
     private final MemberService memberService;
@@ -25,7 +25,7 @@ public class MemberController {
         MemberEntity member = memberMapper.postToMember(request);
 
         MemberEntity createdMember = memberService.createMember(member);
-        URI location = UriCreator.createUri("/healthcheck/member", createdMember.getId());
+        URI location = UriCreator.createUri("/member", createdMember.getId());
 
         return ResponseEntity.created(location).build();
     }
