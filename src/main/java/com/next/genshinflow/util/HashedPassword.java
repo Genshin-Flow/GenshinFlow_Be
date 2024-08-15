@@ -1,14 +1,9 @@
 package com.next.genshinflow.util;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
+public record HashedPassword(
+    String encodedPassword,
+    String salt
+) {
 
-@Accessors(chain = true)
-@Getter
-@Setter
-public class HashedPassword {
-
-    private String encodedPassword;
-    private String salt;
+    public static HashedPassword EMPTY = new HashedPassword(null, null);
 }
