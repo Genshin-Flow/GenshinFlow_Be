@@ -1,8 +1,8 @@
 package com.next.genshinflow.application.posting.controller.publicapi;
 
+import com.next.genshinflow.application.PageResponse;
 import com.next.genshinflow.application.posting.response.PostingResponse;
 import com.next.genshinflow.auth.UserAuth;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,12 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class PostingController implements PostingAPI {
 
 
-    public ResponseEntity<List<PostingResponse>> getRequests(long size) {
-        return null;
-    }
-
-    @UserAuth
-    public ResponseEntity<List<PostingResponse>> getMyRequests() {
+    public ResponseEntity<PageResponse<PostingResponse>> getRequests(long size) {
         return null;
     }
 

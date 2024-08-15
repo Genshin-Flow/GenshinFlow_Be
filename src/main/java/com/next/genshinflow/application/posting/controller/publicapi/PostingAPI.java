@@ -1,10 +1,10 @@
 package com.next.genshinflow.application.posting.controller.publicapi;
 
 
+import com.next.genshinflow.application.PageResponse;
 import com.next.genshinflow.application.posting.response.PostingResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
 import org.springframework.http.ResponseEntity;
 
 @Tag(name = "Posting API", description = "포스팅 API")
@@ -14,15 +14,9 @@ public interface PostingAPI {
         summary = "포스팅 목록",
         description = "최근 포스팅을 size 개 가져옵니다. 최대개수 : 100"
     )
-    ResponseEntity<List<PostingResponse>> getRequests(
+    ResponseEntity<PageResponse<PostingResponse>> getRequests(
         long size
     );
-
-    @Operation(
-        summary = "자신이 작성한 포스팅 목록",
-        description = "요청자가 작성한 포스팅를 가져옵니다."
-    )
-    ResponseEntity<List<PostingResponse>> getMyRequests();
 
     @Operation(summary = "비회원 리퀘스트 작성", description = "비회원의 리퀘스트를 등록합니다.")
     ResponseEntity<PostingResponse> createRequestByNonMember(
