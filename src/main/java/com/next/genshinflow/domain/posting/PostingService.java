@@ -1,10 +1,10 @@
 package com.next.genshinflow.domain.posting;
 
+import com.next.genshinflow.domain.user.entity.MemberEntity;
 import com.next.genshinflow.exception.BusinessLogicException;
 import com.next.genshinflow.exception.ExceptionCode;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -35,10 +35,9 @@ public class PostingService {
     @Transactional
     public Posting modifyPosting(Posting posting) {
         Posting source = postingRepository.findById(posting.getId())
-            .filter(it -> Optional.ofNullable(it.getWriter())
-                .filter(writer -> Objects.equals(writer.getId(), posting.getWriter().getId()))
-                .isPresent())
+            .filter(it -> this.isWriter(posting.getWriter().getId(), it))
             .orElseThrow(() -> new BusinessLogicException(ExceptionCode.POSTING_NOT_FOUND));
+
         posting.setId(source.getId());
         posting.setDeleted(false);
         posting.setCreatedAt(source.getCreatedAt());
@@ -53,8 +52,27 @@ public class PostingService {
             .orElseThrow(() -> new BusinessLogicException(ExceptionCode.POSTING_NOT_FOUND));
     }
 
-    public void deletePosting(long id) {
-        postingRepository.deleteById(id);
+    @Transactional
+    public void deleteNonMemberPosting(long postingId) {
+        postingRepository.findById(postingId)
+            .map(posting -> posting.setDeleted(true))
+            .orElseThrow(() -> new BusinessLogicException(ExceptionCode.POSTING_NOT_FOUND));
+    }
+
+    @Transactional
+    public void deleteMemberPosting(long postingId, long accountId) {
+        postingRepository.findById(postingId)
+            .filter(posting -> this.isWriter(accountId, posting))
+            .map(posting -> posting.setDeleted(true))
+            .orElseThrow(() -> new BusinessLogicException(ExceptionCode.POSTING_NOT_FOUND));
+    }
+
+    private boolean isWriter(long accountId, Posting posting) {
+        return Optional.ofNullable(posting)
+            .map(Posting::getWriter)
+            .map(MemberEntity::getId)
+            .filter(id -> id == accountId)
+            .isPresent();
     }
 
     private Posting setUpdatedAtToNow(Posting posting) {

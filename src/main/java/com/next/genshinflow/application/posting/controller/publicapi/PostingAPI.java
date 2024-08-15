@@ -53,12 +53,12 @@ public interface PostingAPI {
     );
 
     @Operation(summary = "비회원 리퀘스트 삭제", description = "비회원의 리퀘스트를 삭제합니다.")
-    ResponseEntity<PostingResponse> deleteRequestByNonMember(
+    ResponseEntity<Void> deleteRequestByNonMember(
         PostingDeleteRequest postingDeleteRequest
     );
 
     @Operation(summary = "회원 리퀘스트 삭제", description = "회원의 리퀘스트를 삭제합니다.")
-    ResponseEntity<PostingResponse> deleteRequestByUser(
+    ResponseEntity<Void> deleteRequestByUser(
         MemberResponse memberResponse,
         PostingDeleteRequest postingDeleteRequest
     );

@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 
 public record PostingResponse(
-    @Schema(description = "포스트 id", type = "long", example = "1")
+    @Schema(description = "포스트 postingId", type = "long", example = "1")
     long id,
     AssignerResponse assigner,
     @Schema(description = "퀘스트 종류", type = "QuestCategory", example = "something")

@@ -50,7 +50,7 @@ public class PostingController implements PostingAPI {
         return ResponseEntity.ok(postingAppService.getPostings(memberResponse, pageable));
     }
 
-    @PostMapping(value = "/create", headers = LOGIN_HEADER)
+    @PostMapping(value = "/create", headers = NO_LOGIN_HEADER)
     public ResponseEntity<PostingResponse> createRequestByNonMember(
         @RequestBody PostingCreateRequest request
     ) {
@@ -60,7 +60,7 @@ public class PostingController implements PostingAPI {
     }
 
     @UserAuth
-    @PostMapping(value = "/create", headers = NO_LOGIN_HEADER)
+    @PostMapping(value = "/create", headers = LOGIN_HEADER)
     public ResponseEntity<PostingResponse> createRequestByUser(
         @AuthenticationPrincipal MemberResponse member,
         @RequestBody PostingCreateRequest request
@@ -70,7 +70,7 @@ public class PostingController implements PostingAPI {
             .body(response);
     }
 
-    @PutMapping(value = "/modify", headers = LOGIN_HEADER)
+    @PutMapping(value = "/modify", headers = NO_LOGIN_HEADER)
     public ResponseEntity<PostingResponse> modifyRequestByNonMember(
         @RequestBody PostingModifyRequest request
     ) {
@@ -79,7 +79,7 @@ public class PostingController implements PostingAPI {
     }
 
     @UserAuth
-    @PutMapping(value = "/modify", headers = NO_LOGIN_HEADER)
+    @PutMapping(value = "/modify", headers = LOGIN_HEADER)
     public ResponseEntity<PostingResponse> modifyRequestByUser(
         @AuthenticationPrincipal MemberResponse member,
         @RequestBody PostingModifyRequest request
@@ -88,23 +88,25 @@ public class PostingController implements PostingAPI {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping(value = "/delete", headers = LOGIN_HEADER)
-    public ResponseEntity<PostingResponse> deleteRequestByNonMember(
-        @RequestBody PostingDeleteRequest postingDeleteRequest
+    @DeleteMapping(value = "/delete", headers = NO_LOGIN_HEADER)
+    public ResponseEntity<Void> deleteRequestByNonMember(
+        @RequestBody PostingDeleteRequest request
     ) {
-        return null;
+        postingAppService.deleteNonMemberPosting(request);
+        return ResponseEntity.noContent().build();
     }
 
     @UserAuth
-    @DeleteMapping(value = "/delete", headers = NO_LOGIN_HEADER)
-    public ResponseEntity<PostingResponse> deleteRequestByUser(
-        @AuthenticationPrincipal MemberResponse memberResponse,
-        @RequestBody PostingDeleteRequest postingDeleteRequest
+    @DeleteMapping(value = "/delete", headers = LOGIN_HEADER)
+    public ResponseEntity<Void> deleteRequestByUser(
+        @AuthenticationPrincipal MemberResponse member,
+        @RequestBody PostingDeleteRequest request
     ) {
-        return null;
+        postingAppService.deleteMemberPosting(request, member);
+        return ResponseEntity.noContent().build();
     }
 
-    @PutMapping(value = "/pullup", headers = LOGIN_HEADER)
+    @PutMapping(value = "/pullup", headers = NO_LOGIN_HEADER)
     public ResponseEntity<PostingResponse> pullUpRequestByNonMember(
         @RequestBody PostingPullUpRequest postingPullUpRequest
     ) {
@@ -112,7 +114,7 @@ public class PostingController implements PostingAPI {
     }
 
     @UserAuth
-    @PutMapping(value = "/pullup", headers = NO_LOGIN_HEADER)
+    @PutMapping(value = "/pullup", headers = LOGIN_HEADER)
     public ResponseEntity<PostingResponse> pullUpRequestByUser(
         @AuthenticationPrincipal MemberResponse memberResponse,
         @RequestBody PostingPullUpRequest postingPullUpRequest

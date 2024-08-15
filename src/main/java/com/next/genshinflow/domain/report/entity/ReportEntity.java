@@ -18,7 +18,7 @@ public class ReportEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "postingId")
     private Long id;
 
     @ManyToOne

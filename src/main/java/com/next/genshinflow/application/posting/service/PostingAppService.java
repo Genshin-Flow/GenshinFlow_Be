@@ -3,6 +3,7 @@ package com.next.genshinflow.application.posting.service;
 import com.next.genshinflow.application.PageResponse;
 import com.next.genshinflow.application.posting.mapper.PostingMapper;
 import com.next.genshinflow.application.posting.request.PostingCreateRequest;
+import com.next.genshinflow.application.posting.request.PostingDeleteRequest;
 import com.next.genshinflow.application.posting.request.PostingModifyRequest;
 import com.next.genshinflow.application.posting.response.PostingResponse;
 import com.next.genshinflow.application.user.response.MemberResponse;
@@ -75,7 +76,7 @@ public class PostingAppService {
     public PostingResponse modifyNonMemberPosting(
         PostingModifyRequest request
     ) {
-        HashedPassword hashedPassword = postingService.getPostingById(request.id())
+        HashedPassword hashedPassword = postingService.getPostingById(request.postingId())
             .getHashedPassword();
         PasswordUtils.verifyPasswordMatches(
             request.password(), hashedPassword.encodedPassword(), hashedPassword.salt());
@@ -98,6 +99,26 @@ public class PostingAppService {
         Posting savedPosting = postingService.modifyPosting(posting);
 
         return PostingMapper.toResponse(savedPosting, true);
+    }
+
+    @Transactional
+    public void deleteNonMemberPosting(
+        PostingDeleteRequest request
+    ) {
+        HashedPassword hashedPassword = postingService.getPostingById(request.postingId())
+            .getHashedPassword();
+        PasswordUtils.verifyPasswordMatches(
+            request.password(), hashedPassword.encodedPassword(), hashedPassword.salt());
+
+        postingService.deleteNonMemberPosting(request.postingId());
+    }
+
+    @Transactional
+    public void deleteMemberPosting(
+        PostingDeleteRequest request,
+        MemberResponse member
+    ) {
+        postingService.deleteMemberPosting(request.postingId(), member.id());
     }
 
 }

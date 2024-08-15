@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 public record MemberResponse(
     @JsonIgnore
-    @Schema(description = "유저 id", type = "long", example = "1")
+    @Schema(description = "유저 postingId", type = "long", example = "1")
     long id,
     @Schema(description = "유저 uid", type = "long", example = "1")
     long uid,
