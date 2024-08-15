@@ -36,8 +36,12 @@ public class Posting extends BaseEntity {
     @Column
     private MemberEntity writer;
 
-    @Column(length = 20)
-    private String title;
+// TODO: FE 단에서 uid 만 내려줄 때 이름/이미지 가져올 수 있는지 문의할 것
+//       가능할 경우, AssignerResponse / mapper 수정할 것
+//
+//    @Column(length = 20)
+//    @Comment("비회원일 경우 비회원의 이름")
+//    private String name;
 
     @Column
     private Long uid;
@@ -50,7 +54,7 @@ public class Posting extends BaseEntity {
     @Column
     private QuestCategory questCategory;
 
-    @Column(nullable = false)
+    @Column
     private int worldLevel;
 
     @Column

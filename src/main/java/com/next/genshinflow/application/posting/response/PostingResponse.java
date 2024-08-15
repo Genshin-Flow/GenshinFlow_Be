@@ -12,8 +12,6 @@ public record PostingResponse(
     QuestCategory category,
     @Schema(description = "월드 레벨", type = "int", example = "7")
     int wordLevel,
-    @Schema(description = "이야기 (요청글 제목)", type = "String", example = "집가고싶어요")
-    String title,
     @Schema(description = "마지막 변경 일시", type = "LocalDateTime", example = "2024-08-12 01:12:00")
     LocalDateTime lastUpdatedAt,
     @Schema(description = "등록일시", type = "LocalDateTime", example = "2024-08-12 01:12:00")
