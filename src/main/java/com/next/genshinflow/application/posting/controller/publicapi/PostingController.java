@@ -108,17 +108,19 @@ public class PostingController implements PostingAPI {
 
     @PutMapping(value = "/pullup", headers = NO_LOGIN_HEADER)
     public ResponseEntity<PostingResponse> pullUpRequestByNonMember(
-        @RequestBody PostingPullUpRequest postingPullUpRequest
+        @RequestBody PostingPullUpRequest request
     ) {
-        return null;
+        PostingResponse response = postingAppService.pullUpNonMemberPosting(request);
+        return ResponseEntity.ok(response);
     }
 
     @UserAuth
     @PutMapping(value = "/pullup", headers = LOGIN_HEADER)
     public ResponseEntity<PostingResponse> pullUpRequestByUser(
-        @AuthenticationPrincipal MemberResponse memberResponse,
-        @RequestBody PostingPullUpRequest postingPullUpRequest
+        @AuthenticationPrincipal MemberResponse member,
+        @RequestBody PostingPullUpRequest request
     ) {
-        return null;
+        PostingResponse response = postingAppService.pullUpMemberPosting(request, member);
+        return ResponseEntity.ok(response);
     }
 }

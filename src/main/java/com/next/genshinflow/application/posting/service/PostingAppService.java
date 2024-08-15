@@ -5,6 +5,7 @@ import com.next.genshinflow.application.posting.mapper.PostingMapper;
 import com.next.genshinflow.application.posting.request.PostingCreateRequest;
 import com.next.genshinflow.application.posting.request.PostingDeleteRequest;
 import com.next.genshinflow.application.posting.request.PostingModifyRequest;
+import com.next.genshinflow.application.posting.request.PostingPullUpRequest;
 import com.next.genshinflow.application.posting.response.PostingResponse;
 import com.next.genshinflow.application.user.response.MemberResponse;
 import com.next.genshinflow.domain.posting.Posting;
@@ -121,4 +122,25 @@ public class PostingAppService {
         postingService.deleteMemberPosting(request.postingId(), member.id());
     }
 
+    @Transactional
+    public PostingResponse pullUpNonMemberPosting(
+        PostingPullUpRequest request
+    ) {
+        HashedPassword hashedPassword = postingService.getPostingById(request.postingId())
+            .getHashedPassword();
+        PasswordUtils.verifyPasswordMatches(
+            request.password(), hashedPassword.encodedPassword(), hashedPassword.salt());
+
+        Posting posting = postingService.pullUpNonMemberPosting(request.postingId());
+        return PostingMapper.toResponse(posting, false);
+    }
+
+    @Transactional
+    public PostingResponse pullUpMemberPosting(
+        PostingPullUpRequest request,
+        MemberResponse member
+    ) {
+        Posting posting = postingService.pullUpMemberPosting(request.postingId(), member.id());
+        return PostingMapper.toResponse(posting, true);
+    }
 }

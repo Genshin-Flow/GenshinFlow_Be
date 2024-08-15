@@ -26,51 +26,51 @@ public interface PostingAPI {
         description = "최근 포스팅을 size 개 가져옵니다. 최대개수 : 100"
     )
     ResponseEntity<PageResponse<PostingResponse>> getRequests(
-        MemberResponse memberResponse,
+        MemberResponse member,
         Pageable pageable
     );
 
     @Operation(summary = "비회원 리퀘스트 작성", description = "비회원의 리퀘스트를 등록합니다.")
     ResponseEntity<PostingResponse> createRequestByNonMember(
-        PostingCreateRequest postingCreateRequest
+        PostingCreateRequest request
     );
 
     @Operation(summary = "회원 리퀘스트 작성", description = "회원의 리퀘스트를 등록합니다")
     ResponseEntity<PostingResponse> createRequestByUser(
-        MemberResponse memberResponse,
-        PostingCreateRequest postingCreateRequest
+        MemberResponse member,
+        PostingCreateRequest request
     );
 
     @Operation(summary = "비회원 리퀘스트 수정", description = "비회원의 리퀘스트를 수정합니다.")
     ResponseEntity<PostingResponse> modifyRequestByNonMember(
-        PostingModifyRequest postingModifyRequest
+        PostingModifyRequest request
     );
 
     @Operation(summary = "회원 리퀘스트 수정", description = "회원의 리퀘스트를 수정합니다.")
     ResponseEntity<PostingResponse> modifyRequestByUser(
-        MemberResponse memberResponse,
-        PostingModifyRequest postingModifyRequest
+        MemberResponse member,
+        PostingModifyRequest request
     );
 
     @Operation(summary = "비회원 리퀘스트 삭제", description = "비회원의 리퀘스트를 삭제합니다.")
     ResponseEntity<Void> deleteRequestByNonMember(
-        PostingDeleteRequest postingDeleteRequest
+        PostingDeleteRequest request
     );
 
     @Operation(summary = "회원 리퀘스트 삭제", description = "회원의 리퀘스트를 삭제합니다.")
     ResponseEntity<Void> deleteRequestByUser(
-        MemberResponse memberResponse,
-        PostingDeleteRequest postingDeleteRequest
+        MemberResponse member,
+        PostingDeleteRequest request
     );
 
     @Operation(summary = "비회원 리퀘스트 끌어올리기", description = "비회원의 리퀘스트을 끌올합니다.")
     ResponseEntity<PostingResponse> pullUpRequestByNonMember(
-        PostingPullUpRequest postingPullUpRequest
+        PostingPullUpRequest request
     );
 
     @Operation(summary = "회원 리퀘스트 끌어올리기", description = "회원의 리퀘스트를 끌올합니다.")
     ResponseEntity<PostingResponse> pullUpRequestByUser(
-        MemberResponse memberResponse,
-        PostingPullUpRequest postingPullUpRequest
+        MemberResponse member,
+        PostingPullUpRequest request
     );
 }

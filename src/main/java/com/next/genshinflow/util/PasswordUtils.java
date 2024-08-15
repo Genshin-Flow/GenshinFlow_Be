@@ -10,7 +10,7 @@ public class PasswordUtils {
     private PasswordUtils() {
     }
 
-    public static HashedPassword hashWithSalt(int password) {
+    public static HashedPassword hashWithSalt(Integer password) {
         if (isNotProperPassword(password)) {
             throw new BusinessLogicException(ExceptionCode.INVALID_PASSWORD_FORMAT);
         }
@@ -57,7 +57,7 @@ public class PasswordUtils {
     }
 
     public static void verifyPasswordMatches(
-        int password,
+        Integer password,
         String encodedPassword,
         String salt
     ) {
@@ -78,7 +78,7 @@ public class PasswordUtils {
         return StringUtils.isNotBlank(password);
     }
 
-    private static boolean isNotProperPassword(int password) {
-        return 0 <= password && password < 10000;
+    private static boolean isNotProperPassword(Integer password) {
+        return password != null && 0 <= password && password < 10000;
     }
 }

@@ -48,8 +48,16 @@ public class PostingService {
     }
 
     @Transactional
-    public Posting pullUpPosting(long postingId) {
+    public Posting pullUpNonMemberPosting(long postingId) {
         return postingRepository.findById(postingId)
+            .map(this::setUpdatedAtToNow)
+            .orElseThrow(() -> new BusinessLogicException(ExceptionCode.POSTING_NOT_FOUND));
+    }
+
+    @Transactional
+    public Posting pullUpMemberPosting(long postingId, long accountId) {
+        return postingRepository.findById(postingId)
+            .filter(posting -> this.isWriter(accountId, posting))
             .map(this::setUpdatedAtToNow)
             .orElseThrow(() -> new BusinessLogicException(ExceptionCode.POSTING_NOT_FOUND));
     }
