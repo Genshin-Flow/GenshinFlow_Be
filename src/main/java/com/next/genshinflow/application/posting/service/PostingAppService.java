@@ -14,13 +14,12 @@ import com.next.genshinflow.domain.user.entity.MemberEntity;
 import com.next.genshinflow.domain.user.repository.MemberRepository;
 import com.next.genshinflow.exception.BusinessLogicException;
 import com.next.genshinflow.exception.ExceptionCode;
-import com.next.genshinflow.util.HashedPassword;
-import com.next.genshinflow.util.PasswordUtils;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -29,6 +28,7 @@ public class PostingAppService {
 
     private final PostingService postingService;
     private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public PostingResponse getPosting(long postingId) {
         Posting posting = postingService.getPostingById(postingId);
@@ -51,9 +51,8 @@ public class PostingAppService {
 
     @Transactional
     public PostingResponse createNonMemberPosting(PostingCreateRequest request) {
-        HashedPassword hashedPassword = PasswordUtils.hashWithSalt(request.password());
-
-        Posting posting = PostingMapper.from(request, null, hashedPassword);
+        String password = passwordEncoder.encode(request.password().toString());
+        Posting posting = PostingMapper.from(request, null, password);
         Posting savedPosting = postingService.createPosting(posting);
 
         return PostingMapper.toResponse(savedPosting, false);
@@ -67,7 +66,7 @@ public class PostingAppService {
         MemberEntity writer = memberRepository.findById(member.id())
             .orElseThrow(() -> new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND));
 
-        Posting posting = PostingMapper.from(request, writer, HashedPassword.EMPTY);
+        Posting posting = PostingMapper.from(request, writer, null);
         Posting savedPosting = postingService.createPosting(posting);
 
         return PostingMapper.toResponse(savedPosting, true);
@@ -77,10 +76,8 @@ public class PostingAppService {
     public PostingResponse modifyNonMemberPosting(
         PostingModifyRequest request
     ) {
-        HashedPassword hashedPassword = postingService.getPostingById(request.postingId())
-            .getHashedPassword();
-        PasswordUtils.verifyPasswordMatches(
-            request.password(), hashedPassword.encodedPassword(), hashedPassword.salt());
+        String hashedPassword = postingService.getPostingById(request.postingId()).getPassword();
+        passwordEncoder.matches(request.password().toString(), hashedPassword);
 
         Posting posting = PostingMapper.from(request, null, hashedPassword);
         Posting savedPosting = postingService.modifyPosting(posting);
@@ -96,7 +93,7 @@ public class PostingAppService {
         MemberEntity writer = memberRepository.findById(member.id())
             .orElseThrow(() -> new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND));
 
-        Posting posting = PostingMapper.from(request, writer, HashedPassword.EMPTY);
+        Posting posting = PostingMapper.from(request, writer, null);
         Posting savedPosting = postingService.modifyPosting(posting);
 
         return PostingMapper.toResponse(savedPosting, true);
@@ -106,10 +103,8 @@ public class PostingAppService {
     public void deleteNonMemberPosting(
         PostingDeleteRequest request
     ) {
-        HashedPassword hashedPassword = postingService.getPostingById(request.postingId())
-            .getHashedPassword();
-        PasswordUtils.verifyPasswordMatches(
-            request.password(), hashedPassword.encodedPassword(), hashedPassword.salt());
+        String hashedPassword = postingService.getPostingById(request.postingId()).getPassword();
+        passwordEncoder.matches(request.password().toString(), hashedPassword);
 
         postingService.deleteNonMemberPosting(request.postingId());
     }
@@ -126,10 +121,8 @@ public class PostingAppService {
     public PostingResponse pullUpNonMemberPosting(
         PostingPullUpRequest request
     ) {
-        HashedPassword hashedPassword = postingService.getPostingById(request.postingId())
-            .getHashedPassword();
-        PasswordUtils.verifyPasswordMatches(
-            request.password(), hashedPassword.encodedPassword(), hashedPassword.salt());
+        String hashedPassword = postingService.getPostingById(request.postingId()).getPassword();
+        passwordEncoder.matches(request.password().toString(), hashedPassword);
 
         Posting posting = postingService.pullUpNonMemberPosting(request.postingId());
         return PostingMapper.toResponse(posting, false);

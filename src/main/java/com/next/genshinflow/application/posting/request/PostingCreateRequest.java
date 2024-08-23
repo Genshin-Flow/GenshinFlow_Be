@@ -25,6 +25,8 @@ public record PostingCreateRequest(
     @NotBlank
     @Schema(description = "설명글", type = "String", example = "집가고싶어요")
     String content,
+    @Min(value = 0)
+    @Max(value = 9999)
     @Schema(description = "비밀번호(비회원일 경우만)", type = "String", example = "1234")
     Integer password,
     @Min(value = 1)

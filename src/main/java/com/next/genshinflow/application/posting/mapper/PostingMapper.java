@@ -6,7 +6,6 @@ import com.next.genshinflow.application.posting.response.AssignerResponse;
 import com.next.genshinflow.application.posting.response.PostingResponse;
 import com.next.genshinflow.domain.posting.Posting;
 import com.next.genshinflow.domain.user.entity.MemberEntity;
-import com.next.genshinflow.util.HashedPassword;
 import java.time.LocalDateTime;
 
 public class PostingMapper {
@@ -48,7 +47,7 @@ public class PostingMapper {
     public static Posting from(
         PostingCreateRequest request,
         MemberEntity member,
-        HashedPassword hashedPassword
+        String password
     ) {
         return new Posting()
             .setWriter(member)
@@ -57,15 +56,14 @@ public class PostingMapper {
             .setQuestCategory(request.questCategory())
             .setWorldLevel(request.wordLevel())
             .setContent(request.content())
-            .setPassword(hashedPassword.encodedPassword())
-            .setPasswordSalt(hashedPassword.salt())
+            .setPassword(password)
             .setCompletedAt(LocalDateTime.now().plusHours(request.autoCompleteTime()));
     }
 
     public static Posting from(
         PostingModifyRequest request,
         MemberEntity member,
-        HashedPassword hashedPassword
+        String password
     ) {
         return new Posting()
             .setWriter(member)
@@ -74,8 +72,7 @@ public class PostingMapper {
             .setQuestCategory(request.questCategory())
             .setWorldLevel(request.wordLevel())
             .setContent(request.content())
-            .setPassword(hashedPassword.encodedPassword())
-            .setPasswordSalt(hashedPassword.salt())
+            .setPassword(password)
             .setCompletedAt(LocalDateTime.now().plusHours(request.autoCompleteTime()));
     }
 }
