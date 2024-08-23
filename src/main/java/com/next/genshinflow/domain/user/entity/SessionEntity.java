@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
@@ -19,7 +20,7 @@ public class SessionEntity extends BaseEntity {
     private Long id;
 
     @ManyToOne
-    @Column
+    @JoinColumn(name = "member_id")
     private MemberEntity member;
 
     @Column

@@ -1,4 +1,4 @@
-package com.next.genshinflow.domain.post.entity;
+package com.next.genshinflow.domain.posting;
 
 import com.next.genshinflow.domain.BaseEntity;
 import com.next.genshinflow.domain.LocalDateTimeAttributeConverter;
@@ -13,15 +13,24 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.hibernate.annotations.Comment;
 
+@Accessors(chain = true)
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
-@Table(name = "post")
-@Comment("메인 대시보드 post")
-public class PostEntity extends BaseEntity {
+@Table(name = "posting")
+@Comment("메인 대시보드 posting")
+public class Posting extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,11 +38,15 @@ public class PostEntity extends BaseEntity {
     private Long id;
 
     @ManyToOne
-    @Column
+    @JoinColumn(name = "writer_id")
     private MemberEntity writer;
 
-    @Column(length = 20)
-    private String title;
+// TODO: FE 단에서 uid 만 내려줄 때 이름/이미지 가져올 수 있는지 문의할 것
+//       가능할 경우, AssignerResponse / mapper 수정할 것
+//
+//    @Column(length = 20)
+//    @Comment("비회원일 경우 비회원의 이름")
+//    private String name;
 
     @Column
     private Long uid;
@@ -46,7 +59,7 @@ public class PostEntity extends BaseEntity {
     @Column
     private QuestCategory questCategory;
 
-    @Column(nullable = false)
+    @Column
     private int worldLevel;
 
     @Column
