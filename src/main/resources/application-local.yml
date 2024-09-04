@@ -11,3 +11,29 @@ spring:
       path: /h2
   datasource:
     url: jdbc:h2:mem:test
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  sql:
+    init:
+      data-locations: classpath:db/h2/data.sql
+logging:
+  level:
+    org:
+      springframework:
+        orm:
+          jpa: DEBUG
+server:
+  servlet:
+    encoding:
+      force-response: true
+
+jwt:
+  key: ${JWT_SECRET_KEY}
+  access-token-expiration-minutes: 60
+  refresh-token-expiration-minutes: 10080
