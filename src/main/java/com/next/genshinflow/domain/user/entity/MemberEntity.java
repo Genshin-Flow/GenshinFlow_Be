@@ -1,5 +1,6 @@
 package com.next.genshinflow.domain.user.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.next.genshinflow.domain.BaseEntity;
 import com.next.genshinflow.enumeration.AccountStatus;
 import com.next.genshinflow.enumeration.Role;
@@ -21,29 +22,31 @@ import lombok.Setter;
 public class MemberEntity extends BaseEntity {
 
     @Id
+    @JsonIgnore
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @Column
+    @Column(name = "uid", unique = true)
     private String uid;
 
-    @Column
+    @Column(name = "name")
     private String name;
 
-    @Column
+    @Column(name = "email", unique = true)
     private String email;
 
-    @Column
+    @JsonIgnore
+    @Column(name = "password", length = 20)
     private String password;
 
-    @Column
+    @Column(name = "image")
     private String image;
 
     @Convert(converter = AccountStatusConverter.class)
-    @Column
+    @Column(name = "status")
     private AccountStatus status;
 
-    @Column
+    @Column(name = "role")
     private Role role;
 }
