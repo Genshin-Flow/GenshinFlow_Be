@@ -9,6 +9,7 @@ public enum ExceptionCode {
     MEMBER_NOT_FOUND(404, "회원을 찾을 수 없습니다."),
     MEMBER_EXISTS(409, "회원이 존재합니다."),
     NO_PERMISSION(403, "권한이 없습니다."),
+    UNAUTHORIZED_USER(401, "인증되지 않은 사용자입니다."),
     JWT_TOKEN_EXPIRED(404, "만료된 JWT 토큰입니다."),
     JWT_SIGNATURE_INVALID(400, "잘못된 JWT 서명입니다."),
     JWT_TOKEN_UNSUPPORTED(400, "지원되지 않는 JWT 토큰입니다."),
