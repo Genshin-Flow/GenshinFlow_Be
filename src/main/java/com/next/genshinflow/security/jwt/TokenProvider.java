@@ -71,11 +71,8 @@ public class TokenProvider implements InitializingBean {
             .compact();
     }
 
+    // 리프레시 토큰은 인증 정보 재발급에만 사용이 되므로 권한을 포함하고 있지 않아도 됨.
     public String createRefreshToken(Authentication authentication) {
-        String authorities = authentication.getAuthorities().stream()
-            .map(GrantedAuthority::getAuthority)
-            .collect(Collectors.joining(","));
-
         long now = (new Date()).getTime();
         Date validity = new Date(now + refreshTokenValidityInMilliseconds);
 
@@ -106,12 +103,13 @@ public class TokenProvider implements InitializingBean {
     }
 
     // 검증
-    public void validateToken(String token) {
+    public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token);
+            return true;
         }
         catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             logger.warn("잘못된 JWT 서명입니다.");
