@@ -1,14 +1,26 @@
 package com.next.genshinflow.application.user.service;
 
+import com.next.genshinflow.application.user.dto.LoginRequest;
+import com.next.genshinflow.application.user.dto.MemberResponse;
+import com.next.genshinflow.application.user.dto.SignUpRequest;
+import com.next.genshinflow.application.user.dto.TokenResponse;
+import com.next.genshinflow.application.user.mapper.MemberMapper;
 import com.next.genshinflow.domain.user.entity.MemberEntity;
 import com.next.genshinflow.domain.user.repository.MemberRepository;
 import com.next.genshinflow.enumeration.AccountStatus;
 import com.next.genshinflow.enumeration.Role;
 import com.next.genshinflow.exception.BusinessLogicException;
 import com.next.genshinflow.exception.ExceptionCode;
+import com.next.genshinflow.security.jwt.TokenProvider;
+import com.next.genshinflow.security.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -17,73 +29,76 @@ import java.util.Optional;
 public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TokenProvider tokenProvider;
+    private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
-    public MemberEntity createMember(MemberEntity member) {
-        verifyExistEmail(member.getEmail());
+     //회원가입시 uid, email, pw 입력칸만 있음
+     //입력 받은 uid로 유저 정보를 가져오는 로직 필요함
+    public MemberResponse createMember(SignUpRequest signUpRequest) {
+        verifyExistEmail(signUpRequest.getEmail());
 
-        String encryptedPassword = passwordEncoder.encode(member.getPassword());
-        member.setPassword(encryptedPassword);
+        // 테스트용
+        String role = Role.USER.getRole();
 
-        member.setRole(Role.USER);
-
-        MemberEntity savedMember = memberRepository.save(member);
-
-        if (member.getName().length() <= 0) {
-            member.setName("모시깽이한 유저" + savedMember.getId());
-            savedMember = memberRepository.save(member);
+        if (signUpRequest.getEmail().equals("admin@test.com")) {
+            role = Role.ADMIN.getRole();
         }
 
-        return savedMember;
+        MemberEntity member = MemberEntity.builder()
+            .uid(signUpRequest.getUid())
+            .email(signUpRequest.getEmail())
+            .password(passwordEncoder.encode(signUpRequest.getPassword()))
+            .status(AccountStatus.ACTIVE_USER)
+            .role(role)
+            .build();
+
+//            .name(uid api.getName())
+//            .image(uid ap.getImage())
+//            .status(uid ap.getStatus())
+//            .build();
+
+        return MemberMapper.memberToResponse(memberRepository.save(member));
     }
 
-    public MemberEntity createMemberOAuth2(MemberEntity member) {
-        return null;
+    // 로그인
+    public TokenResponse authenticate(LoginRequest loginRequest) {
+        UsernamePasswordAuthenticationToken authenticationToken =
+            new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword());
+
+        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        String accessToken = tokenProvider.createToken(authentication);
+        String refreshToken = tokenProvider.createRefreshToken(authentication);
+
+        return new TokenResponse(accessToken, refreshToken);
     }
 
-    public MemberEntity setProfileImg(long memberId) {
-        return null;
-    }
-
-    public MemberEntity updateMember(long loginId, MemberEntity member) {
-        verifyPermission(loginId, member.getId());
-        MemberEntity findMember = findMember(member.getId());
-
-        if (member.getUid().equals(findMember.getUid())) {
-            findMember.setUid(member.getUid());
+    public TokenResponse refreshAccessToken(String refreshToken) {
+        if (!tokenProvider.validateToken(refreshToken)) {
+            throw new BusinessLogicException(ExceptionCode.INVALID_REFRESH_TOKEN);
         }
 
-        // 이름 중복이 가능한지 회의 필요함
-        if (member.getName().equals(findMember.getName())) {
-            findMember.setName(member.getName());
-        }
+        Authentication authentication = tokenProvider.getAuthentication(refreshToken);
+        String newAccessToken = tokenProvider.createToken(authentication);
 
-        return findMember;
+        return new TokenResponse(newAccessToken, refreshToken);
     }
 
-    public MemberEntity updatePassword(long loginId, MemberEntity member) {
-        return null;
+    @Transactional(readOnly = true)
+    public MemberResponse getMyInfo() {
+        return MemberMapper.memberToResponse(
+            SecurityUtil.getCurrentUsername()
+                .flatMap(memberRepository::findByEmail)
+                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND))
+        );
     }
 
-    public MemberEntity updateActiveStatus(long memberId) {
-        MemberEntity findMember = findMember(memberId);
-        findMember.setStatus(AccountStatus.ACTIVE_USER);
-
-        return findMember;
-    }
-
-    public MemberEntity updateDeleteStatus(long memberId) {
-        MemberEntity findMember = findMember(memberId);
-        findMember.setStatus(AccountStatus.DELETED_USER);
-
-        return findMember;
-    }
-
-    // 개발자, 관리자 용
-    public void deleteMember(long loginId, long memberId) {
-        verifyPermission(loginId, memberId);
-        MemberEntity member = findMember(memberId);
-
-        memberRepository.delete(member);
+    @Transactional(readOnly = true)
+    public MemberResponse getMemberInfo(Long memberId) {
+        MemberEntity memberEntity = memberRepository.findById(memberId)
+            .orElseThrow(() -> new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND));
+        return MemberMapper.memberToResponse(memberEntity);
     }
 
     // 이메일 검증
@@ -94,15 +109,18 @@ public class MemberService {
     }
 
     // 해당 사용자, 권한 검증
-    public void verifyPermission(long loginId, long memberId) {
-        MemberEntity member = findMember(loginId);
-
-        if (member.getRole() != Role.ADMIN) {
-            if (loginId != memberId) {
-                throw new BusinessLogicException(ExceptionCode.NO_PERMISSION);
-            }
-        }
-    }
+//    public void verifyPermission(long loginId, long memberId) {
+//        MemberEntity member = findMember(loginId);
+//
+//        boolean isAdmin = member.getRole().stream()
+//            .anyMatch(authority -> authority.getAuthorityName().equals(Role.ADMIN.getRole()));
+//
+//        if (!isAdmin) {
+//            if (loginId != memberId) {
+//                throw new BusinessLogicException(ExceptionCode.NO_PERMISSION);
+//            }
+//        }
+//    }
 
     public MemberEntity findMember(long memberId) {
         return memberRepository.findById(memberId)
