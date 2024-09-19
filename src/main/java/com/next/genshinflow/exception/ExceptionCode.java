@@ -13,7 +13,8 @@ public enum ExceptionCode {
     JWT_TOKEN_EXPIRED(404, "만료된 JWT 토큰입니다."),
     JWT_SIGNATURE_INVALID(400, "잘못된 JWT 서명입니다."),
     JWT_TOKEN_UNSUPPORTED(400, "지원되지 않는 JWT 토큰입니다."),
-    JWT_TOKEN_MALFORMED(400, "잘못된 JWT 입력값이 제공되었습니다.");
+    JWT_TOKEN_MALFORMED(400, "잘못된 JWT 입력값이 제공되었습니다."),
+    INVALID_REFRESH_TOKEN(400, "유효하지 않은 리프레시 토큰입니다.");
     private final int status;
     private final String message;
 }
