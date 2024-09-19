@@ -1,11 +1,11 @@
 package com.next.genshinflow.security.config;
 
-import com.next.genshinflow.enumeration.Role;
 import com.next.genshinflow.security.jwt.JwtAccessDeniedHandler;
 import com.next.genshinflow.security.jwt.JwtAuthenticationEntryPoint;
 import com.next.genshinflow.security.jwt.JwtFilter;
 import com.next.genshinflow.security.jwt.TokenProvider;
 import lombok.AllArgsConstructor;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -80,9 +80,10 @@ public class SecurityConfig {
 
             // URL 인가 설정
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/admin/**").hasRole(Role.ADMIN.getRole())
-                .requestMatchers("/member/my-page").hasRole(Role.USER.getRole())
-                .anyRequest().permitAll()
+                .requestMatchers("/", "/**").permitAll()
+                .requestMatchers(PathRequest.toH2Console()).permitAll()
+                .requestMatchers("/error").permitAll()
+                .anyRequest().authenticated()
             )
 
             // JwtFilter를 UsernamePasswordAuthenticationFilter 전에 추가
