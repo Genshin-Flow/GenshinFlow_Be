@@ -13,8 +13,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Collections;
 
 // 이 클래스는 Member 객체를 Spring Security가 이해할 수 있는 UserDetails 객체로 변환하여 인증 과정에서 사용함
 @Component("userDetailsService")
@@ -31,14 +30,12 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     private org.springframework.security.core.userdetails.User createMember(MemberEntity member) {
-        List<GrantedAuthority> grantedAuthorities = member.getAuthorities().stream()
-            .map(authorityEntity -> new SimpleGrantedAuthority(authorityEntity.getAuthorityName()))
-            .collect(Collectors.toList());
+        GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(member.getRole());
 
         return new org.springframework.security.core.userdetails.User(
             member.getEmail(),
             member.getPassword(),
-            grantedAuthorities
+            Collections.singleton(grantedAuthority)
         );
     }
 }
