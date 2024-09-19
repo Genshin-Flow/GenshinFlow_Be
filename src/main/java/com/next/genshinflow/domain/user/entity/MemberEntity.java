@@ -1,53 +1,55 @@
 package com.next.genshinflow.domain.user.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.next.genshinflow.domain.BaseEntity;
 import com.next.genshinflow.enumeration.AccountStatus;
-import com.next.genshinflow.enumeration.Role;
 import com.next.genshinflow.enumeration.converter.AccountStatusConverter;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
-import java.util.Set;
+import lombok.*;
 
 @Getter
 @Setter
 @Entity
+@Builder
 @Table(name = "member")
+@AllArgsConstructor
+@NoArgsConstructor
 public class MemberEntity extends BaseEntity {
 
     @Id
+    @JsonIgnore
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "member_id")
     private Long id;
 
-    @Column
-    private String uid;
+    @Column(name = "uid", unique = true)
+    private long uid;
 
-    @Column
+    @Column(name = "name")
     private String name;
 
-    @Column
+    @Column(name = "email", unique = true)
     private String email;
 
-    @Column
+    @JsonIgnore
+    @Column(name = "password")
     private String password;
 
-    @Column
+    @Column(name = "image")
     private String image;
 
+    @Column(name = "level")
+    private int level;
+
+    @Column(name = "world_level")
+    private int worldLevel;
+
+    @Column(name = "towerLevel")
+    private String towerLevel;
+
     @Convert(converter = AccountStatusConverter.class)
-    @Column
+    @Column(name = "status")
     private AccountStatus status;
 
-    @Column
-    private Role role;
-
-    @ManyToMany
-    @JoinTable(
-        name = "member_authority",
-        joinColumns = {@JoinColumn(name = "member_id", referencedColumnName = "member_id")},
-        inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "authority_name")}
-    )
-    private Set<AuthorityEntity> authorities;
+    private String role;
 }
