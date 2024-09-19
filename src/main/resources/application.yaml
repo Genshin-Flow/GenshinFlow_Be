@@ -1,3 +1,28 @@
 spring:
-  application:
-    name: genshinflow
+
+  datasource:
+    driver-class-name: org.h2.Driver
+    jdbc-url: 'jdbc:h2:mem:test'
+    username: sa
+    password:
+    hikari:
+      connection-timeout: 1000
+      validation-timeout: 1000
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+        hbm2ddl:
+          auto: create
+  h2:
+    console:
+      enabled: true
+      path: /h2
+
+jwt:
+  header: Authorization
+  secret: c2lsdmVybmluZS10ZWNoLXNwcmluZy1ib290LWp3dC10dXRvcmlhbC1zZWNyZXQtc2lsdmVybmluZS10ZWNoLXNwcmluZy1ib290LWp3dC10dXRvcmlhbC1zZWNyZXQK
+  token-validity-in-seconds: 86400
+  refresh-token-validity-in-seconds: 604800
