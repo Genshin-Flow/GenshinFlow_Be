@@ -2,15 +2,7 @@ package com.next.genshinflow.domain.report.entity;
 
 import com.next.genshinflow.domain.BaseEntity;
 import com.next.genshinflow.domain.user.entity.MemberEntity;
-import com.next.genshinflow.enumeration.UserStatus;
-import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "report")
@@ -22,17 +14,17 @@ public class ReportEntity extends BaseEntity {
     private Long id;
 
     @ManyToOne
-    @Column
+    @JoinColumn(name = "reporter_id")
     private MemberEntity reporter;
 
     @ManyToOne
-    @Column
+    @JoinColumn(name = "reportee_id")
     private MemberEntity reportee;
 
     @Column
     private String content;
 
-    @Convert(converter = UserStatusConverter.class)
+//    @Convert(converter = ReportStatusConverter.class)
     @Column
-    private UserStatus status;
+    private ReportEntity status;
 }

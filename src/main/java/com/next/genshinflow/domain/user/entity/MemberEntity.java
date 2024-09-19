@@ -6,25 +6,25 @@ import com.next.genshinflow.enumeration.AccountStatus;
 import com.next.genshinflow.enumeration.Role;
 import com.next.genshinflow.enumeration.converter.AccountStatusConverter;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
-import java.util.Set;
+import lombok.*;
 
 @Getter
 @Setter
 @Entity
+@Builder
 @Table(name = "member")
+@AllArgsConstructor
+@NoArgsConstructor
 public class MemberEntity extends BaseEntity {
 
     @Id
     @JsonIgnore
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "member_id")
     private Long id;
 
     @Column(name = "uid", unique = true)
-    private String uid;
+    private long uid;
 
     @Column(name = "name")
     private String name;
@@ -33,7 +33,7 @@ public class MemberEntity extends BaseEntity {
     private String email;
 
     @JsonIgnore
-    @Column(name = "password", length = 20)
+    @Column(name = "password")
     private String password;
 
     @Column(name = "image")
@@ -43,14 +43,5 @@ public class MemberEntity extends BaseEntity {
     @Column(name = "status")
     private AccountStatus status;
 
-    @Column(name = "role")
-    private Role role;
-
-    @ManyToMany
-    @JoinTable(
-        name = "member_authority",
-        joinColumns = {@JoinColumn(name = "member_id", referencedColumnName = "member_id")},
-        inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "authority_name")}
-    )
-    private Set<AuthorityEntity> authorities;
+    private String role;
 }
