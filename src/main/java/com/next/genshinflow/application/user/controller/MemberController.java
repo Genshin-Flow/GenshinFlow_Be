@@ -1,80 +1,32 @@
 package com.next.genshinflow.application.user.controller;
 
-import com.next.genshinflow.application.user.dto.SignUpRequest;
-import com.next.genshinflow.application.user.mapper.MemberMapper;
+import com.next.genshinflow.application.user.dto.MemberResponse;
+import com.next.genshinflow.application.user.dto.TokenResponse;
 import com.next.genshinflow.application.user.service.MemberService;
-import com.next.genshinflow.domain.user.entity.MemberEntity;
-import com.next.genshinflow.domain.utils.UriCreator;
-import jakarta.validation.Valid;
+import com.next.genshinflow.security.jwt.TokenProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-
-import java.net.URI;
 
 @RestController
 @RequestMapping("/member")
 @RequiredArgsConstructor
 public class MemberController {
     private final MemberService memberService;
-    private final MemberMapper memberMapper;
 
-    @PostMapping("/signup")
-    public ResponseEntity signUpMember(@Valid @RequestBody SignUpRequest request) {
-        MemberEntity member = memberMapper.postToMember(request);
-
-        MemberEntity createdMember = memberService.createMember(member);
-        URI location = UriCreator.createUri("/member", createdMember.getId());
-
-        return ResponseEntity.created(location).build();
+    @GetMapping("/info")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    public ResponseEntity<MemberResponse> getMyInfo() {
+        return ResponseEntity.ok(memberService.getMyInfo());
     }
 
-    public ResponseEntity loginGoogle() {
-        return null;
-    }
-
-    public ResponseEntity loginNaver() {
-        return null;
-    }
-
-    @PostMapping()
-    public ResponseEntity logout() {
-        return null;
-    }
-
-    @GetMapping()
-    public ResponseEntity getMember() {
-        return null;
-    }
-
-    @GetMapping
-    public ResponseEntity getMembers() {
-        return null;
-    }
-
-    @PatchMapping()
-    public ResponseEntity setProfileImg() {
-        return null;
-    }
-
-    @PatchMapping()
-    public ResponseEntity patchMember() {
-        return null;
-    }
-
-    @PatchMapping()
-    public ResponseEntity patchStatusActive() {
-        return null;
-    }
-
-    @PatchMapping()
-    public ResponseEntity patchStatusDelete() {
-        return null;
-    }
-
-    @DeleteMapping()
-    public ResponseEntity deleteMember() {
-        return null;
+    @GetMapping("/info/{memberId}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public ResponseEntity<MemberResponse> getUserInfo(@PathVariable Long memberId) {
+        return ResponseEntity.ok(memberService.getMemberInfo(memberId));
     }
 }
