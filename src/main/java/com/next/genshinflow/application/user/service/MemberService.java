@@ -1,9 +1,6 @@
 package com.next.genshinflow.application.user.service;
 
-import com.next.genshinflow.application.user.dto.LoginRequest;
-import com.next.genshinflow.application.user.dto.MemberResponse;
-import com.next.genshinflow.application.user.dto.SignUpRequest;
-import com.next.genshinflow.application.user.dto.TokenResponse;
+import com.next.genshinflow.application.user.dto.*;
 import com.next.genshinflow.application.user.mapper.MemberMapper;
 import com.next.genshinflow.domain.user.entity.MemberEntity;
 import com.next.genshinflow.domain.user.repository.MemberRepository;
@@ -14,6 +11,8 @@ import com.next.genshinflow.exception.ExceptionCode;
 import com.next.genshinflow.security.jwt.TokenProvider;
 import com.next.genshinflow.security.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -27,10 +26,12 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class MemberService {
+    private static final Logger logger = LoggerFactory.getLogger(ApiService.class);
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final ApiService apiService;
 
      //회원가입시 uid, email, pw 입력칸만 있음
      //입력 받은 uid로 유저 정보를 가져오는 로직 필요함
@@ -39,25 +40,35 @@ public class MemberService {
 
         // 테스트용
         String role = Role.USER.getRole();
-
         if (signUpRequest.getEmail().equals("admin@test.com")) {
             role = Role.ADMIN.getRole();
         }
 
+        UserInfoResponse apiResponse = apiService.callExternalApi(signUpRequest.getUid()).block();
+        if (apiResponse == null || apiResponse.getPlayerInfo() == null) {
+            throw new RuntimeException("Failed to fetch user info from external API");
+        }
+
+        String profileImgPath = apiService.getIconPathForProfilePicture(apiResponse.getPlayerInfo().getProfilePicture().getId());
+        String tower = apiResponse.getPlayerInfo().getTowerFloorIndex()+"-"+apiResponse.getPlayerInfo().getTowerLevelIndex();
+
         MemberEntity member = MemberEntity.builder()
             .uid(signUpRequest.getUid())
+            .name(apiResponse.getPlayerInfo().getNickname())
             .email(signUpRequest.getEmail())
             .password(passwordEncoder.encode(signUpRequest.getPassword()))
+            .image(profileImgPath)
+            .level(apiResponse.getPlayerInfo().getLevel())
+            .worldLevel(apiResponse.getPlayerInfo().getWorldLevel())
+            .towerLevel(tower)
             .status(AccountStatus.ACTIVE_USER)
             .role(role)
             .build();
 
-//            .name(uid api.getName())
-//            .image(uid ap.getImage())
-//            .status(uid ap.getStatus())
-//            .build();
+        MemberEntity savedMember = memberRepository.save(member);
+        logger.info("Member created: {}", savedMember);
 
-        return MemberMapper.memberToResponse(memberRepository.save(member));
+        return MemberMapper.memberToResponse(savedMember);
     }
 
     // 로그인
@@ -67,6 +78,15 @@ public class MemberService {
 
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        MemberEntity findMember = findMember(loginRequest.getEmail());
+
+        UserInfoResponse apiResponse = apiService.callExternalApi(findMember.getUid()).block();
+        if (apiResponse == null || apiResponse.getPlayerInfo() == null) {
+            throw new RuntimeException("Failed to fetch user info from external API");
+        }
+
+        updateMemberIfChanged(findMember, apiResponse);
 
         String accessToken = tokenProvider.createToken(authentication);
         String refreshToken = tokenProvider.createRefreshToken(authentication);
@@ -122,9 +142,38 @@ public class MemberService {
 //        }
 //    }
 
-    public MemberEntity findMember(long memberId) {
-        return memberRepository.findById(memberId)
+    public MemberEntity findMember(String email) {
+        return memberRepository.findByEmail(email)
             .orElseThrow(() ->
                 new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND));
+    }
+
+    private void updateMemberIfChanged(MemberEntity member, UserInfoResponse apiResponse) {
+        UserInfoResponse.PlayerInfo playerInfo = apiResponse.getPlayerInfo();
+        if (playerInfo == null) return;
+        boolean isUpdated = false;
+
+        if (!member.getName().equals(playerInfo.getNickname())) {
+            member.setName(playerInfo.getNickname());
+            isUpdated = true;
+        }
+        if (member.getLevel() != playerInfo.getLevel()) {
+            member.setLevel(playerInfo.getLevel());
+            isUpdated = true;
+        }
+        if (member.getWorldLevel() != playerInfo.getWorldLevel()) {
+            member.setWorldLevel(playerInfo.getWorldLevel());
+            isUpdated = true;
+        }
+
+        String tower = playerInfo.getTowerFloorIndex() + "-" + playerInfo.getTowerLevelIndex();
+        if (!member.getTowerLevel().equals(tower)) {
+            member.setTowerLevel(tower);
+            isUpdated = true;
+        }
+
+        if (isUpdated) {
+            memberRepository.save(member);
+        }
     }
 }
