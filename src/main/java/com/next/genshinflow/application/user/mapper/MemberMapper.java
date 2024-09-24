@@ -23,6 +23,9 @@ public class MemberMapper {
             .name(member.getName())
             .email(member.getEmail())
             .image(member.getImage())
+            .level(member.getLevel())
+            .worldLevel(member.getWorldLevel())
+            .towerLevel(member.getTowerLevel())
             .status(member.getStatus())
             .role(member.getRole())
             .build();
