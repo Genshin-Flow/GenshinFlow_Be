@@ -14,6 +14,9 @@ public class MemberResponse {
     private String name;
     private String email;
     private String image;
+    private int level;
+    private int worldLevel;
+    private String towerLevel;
     private AccountStatus status;
 
 //    private Set<AuthorityResponse> role;
