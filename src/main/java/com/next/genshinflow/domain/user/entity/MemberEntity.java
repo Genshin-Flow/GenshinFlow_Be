@@ -3,7 +3,6 @@ package com.next.genshinflow.domain.user.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.next.genshinflow.domain.BaseEntity;
 import com.next.genshinflow.enumeration.AccountStatus;
-import com.next.genshinflow.enumeration.Role;
 import com.next.genshinflow.enumeration.converter.AccountStatusConverter;
 import jakarta.persistence.*;
 import lombok.*;
@@ -38,6 +37,15 @@ public class MemberEntity extends BaseEntity {
 
     @Column(name = "image")
     private String image;
+
+    @Column(name = "level")
+    private int level;
+
+    @Column(name = "world_level")
+    private int worldLevel;
+
+    @Column(name = "towerLevel")
+    private String towerLevel;
 
     @Convert(converter = AccountStatusConverter.class)
     @Column(name = "status")
