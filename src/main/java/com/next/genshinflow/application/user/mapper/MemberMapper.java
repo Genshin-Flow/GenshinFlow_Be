@@ -7,14 +7,6 @@ public class MemberMapper {
 
     private MemberMapper() {}
 
-    public MemberEntity postDtoToMember(SignUpRequest signUpRequest) {
-        return MemberEntity.builder()
-            .uid(signUpRequest.getUid())
-            .email(signUpRequest.getEmail())
-            .password(signUpRequest.getPassword())
-            .build();
-    }
-
     public static MemberResponse memberToResponse(MemberEntity member) {
         if (member == null) return null;
 
