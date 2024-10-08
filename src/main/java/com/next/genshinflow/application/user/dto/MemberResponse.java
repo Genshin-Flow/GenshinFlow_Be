@@ -4,7 +4,6 @@ import com.next.genshinflow.enumeration.AccountStatus;
 import lombok.*;
 
 @Getter
-@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,7 +17,5 @@ public class MemberResponse {
     private int worldLevel;
     private String towerLevel;
     private AccountStatus status;
-
-//    private Set<AuthorityResponse> role;
     private String role;
 }
