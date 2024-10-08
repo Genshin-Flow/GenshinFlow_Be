@@ -1,14 +1,10 @@
 package com.next.genshinflow.application.user.controller;
 
 import com.next.genshinflow.application.user.dto.MemberResponse;
-import com.next.genshinflow.application.user.dto.TokenResponse;
 import com.next.genshinflow.application.user.service.MemberService;
-import com.next.genshinflow.security.jwt.TokenProvider;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 
