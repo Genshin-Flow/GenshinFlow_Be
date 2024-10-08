@@ -23,6 +23,6 @@ spring:
 
 jwt:
   header: Authorization
-  key: ${JWT_SECRET_KEY}
+  secret: ${JWT_SECRET_KEY}
   token-validity-in-seconds: 86400
   refresh-token-validity-in-seconds: 604800
