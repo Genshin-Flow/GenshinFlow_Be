@@ -5,8 +5,7 @@ import com.next.genshinflow.exception.ExceptionCode;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,8 +22,8 @@ import java.util.Date;
 import java.util.stream.Collectors;
 
 @Component
+@Slf4j
 public class TokenProvider implements InitializingBean {
-    private final Logger logger = LoggerFactory.getLogger(TokenProvider.class);
     private static final String AUTHORITIES_KEY = "auth";
     private final String secret;
     private final long tokenValidityInMilliseconds;
@@ -48,7 +47,7 @@ public class TokenProvider implements InitializingBean {
             this.key = Keys.hmacShaKeyFor(keyBytes);
         }
         catch (IllegalArgumentException e) {
-            logger.error("Error decoding secret key: ", e);
+            log.error("Error decoding secret key: ", e);
             throw new IllegalArgumentException("Invalid Base64 Key", e);
         }
     }
@@ -64,9 +63,7 @@ public class TokenProvider implements InitializingBean {
         return Jwts.builder()
             .setSubject(authentication.getName())
             .claim(AUTHORITIES_KEY, authorities)
-            // 보안이 크게 중요하지 않아 성능을 위주로 HS256 알고리즘을 채택했음.
-            // 보안 이슈 발생 시 HS512로 변경 요망
-            .signWith(key, SignatureAlgorithm.HS256)
+            .signWith(key, SignatureAlgorithm.HS512)
             .setExpiration(validity)
             .compact();
     }
@@ -79,7 +76,7 @@ public class TokenProvider implements InitializingBean {
         return Jwts.builder()
             .setSubject(authentication.getName())
             .setExpiration(validity)
-            .signWith(key, SignatureAlgorithm.HS256)
+            .signWith(key, SignatureAlgorithm.HS512)
             .compact();
     }
 
@@ -112,19 +109,19 @@ public class TokenProvider implements InitializingBean {
             return true;
         }
         catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
-            logger.warn("잘못된 JWT 서명입니다.");
+            log.warn("잘못된 JWT 서명입니다.");
             throw new BusinessLogicException(ExceptionCode.JWT_SIGNATURE_INVALID);
         }
         catch (ExpiredJwtException e) {
-            logger.warn("만료된 JWT 토큰입니다.");
+            log.warn("만료된 JWT 토큰입니다.");
             throw new BusinessLogicException(ExceptionCode.JWT_TOKEN_EXPIRED);
         }
         catch (UnsupportedJwtException e) {
-            logger.warn("지원되지 않는 JWT 토큰입니다.");
+            log.warn("지원되지 않는 JWT 토큰입니다.");
             throw new BusinessLogicException(ExceptionCode.JWT_TOKEN_UNSUPPORTED);
         }
         catch (IllegalArgumentException e) {
-            logger.error("잘못된 JWT 입력값이 제공되었습니다.");
+            log.error("잘못된 JWT 입력값이 제공되었습니다.");
             throw new BusinessLogicException(ExceptionCode.JWT_TOKEN_MALFORMED);
         }
     }
