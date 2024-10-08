@@ -4,8 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.next.genshinflow.application.user.dto.ProfileImgDataResponse;
 import com.next.genshinflow.application.user.dto.UserInfoResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -16,8 +15,8 @@ import java.io.InputStream;
 import java.util.List;
 
 @Service
+@Slf4j
 public class ApiService {
-    private static final Logger logger = LoggerFactory.getLogger(ApiService.class);
     private final WebClient.Builder webClientBuilder;
     private final ObjectMapper objectMapper;
 
@@ -34,8 +33,8 @@ public class ApiService {
             .uri("https://enka.network/api/uid/" + uid + "?info")
             .retrieve()
             .bodyToMono(UserInfoResponse.class)
-            .doOnNext(response -> logger.info("API Response: {}", response))
-            .doOnError(error -> logger.error("API Error: {}", error.getMessage()));
+            .doOnNext(response -> log.info("API Response: {}", response))
+            .doOnError(error -> log.error("API Error: {}", error.getMessage()));
     }
 
     // 이미지 id를 경로로 반환

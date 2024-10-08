@@ -11,8 +11,7 @@ import com.next.genshinflow.exception.ExceptionCode;
 import com.next.genshinflow.security.jwt.TokenProvider;
 import com.next.genshinflow.security.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -24,9 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class MemberService {
-    private static final Logger logger = LoggerFactory.getLogger(ApiService.class);
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
@@ -37,12 +36,6 @@ public class MemberService {
      //입력 받은 uid로 유저 정보를 가져오는 로직 필요함
     public MemberResponse createMember(SignUpRequest signUpRequest) {
         verifyExistEmail(signUpRequest.getEmail());
-
-        // 테스트용
-        String role = Role.USER.getRole();
-        if (signUpRequest.getEmail().equals("admin@test.com")) {
-            role = Role.ADMIN.getRole();
-        }
 
         UserInfoResponse apiResponse = apiService.callExternalApi(signUpRequest.getUid()).block();
         if (apiResponse == null || apiResponse.getPlayerInfo() == null) {
@@ -62,11 +55,11 @@ public class MemberService {
             .worldLevel(apiResponse.getPlayerInfo().getWorldLevel())
             .towerLevel(tower)
             .status(AccountStatus.ACTIVE_USER)
-            .role(role)
+            .role(Role.USER.getRole())
             .build();
 
         MemberEntity savedMember = memberRepository.save(member);
-        logger.info("Member created: {}", savedMember);
+        log.info("Member created: {}", savedMember);
 
         return MemberMapper.memberToResponse(savedMember);
     }
