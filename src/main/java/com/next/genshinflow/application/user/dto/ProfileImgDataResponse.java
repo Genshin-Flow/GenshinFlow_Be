@@ -1,6 +1,5 @@
 package com.next.genshinflow.application.user.dto;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

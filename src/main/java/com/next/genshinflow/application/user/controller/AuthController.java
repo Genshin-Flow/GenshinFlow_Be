@@ -5,7 +5,6 @@ import com.next.genshinflow.application.user.service.MemberService;
 import com.next.genshinflow.domain.utils.UriCreator;
 import com.next.genshinflow.security.jwt.JwtFilter;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
