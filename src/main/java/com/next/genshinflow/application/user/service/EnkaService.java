@@ -4,37 +4,42 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.next.genshinflow.application.user.dto.ProfileImgDataResponse;
 import com.next.genshinflow.application.user.dto.UserInfoResponse;
+import com.next.genshinflow.infrastructure.EnkaClient;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-@Service
 @Slf4j
-public class ApiService {
-    private final WebClient.Builder webClientBuilder;
+@Service
+@RequiredArgsConstructor
+public class EnkaService {
+    private final EnkaClient enkaClient;
     private final ObjectMapper objectMapper;
 
-    @Autowired
-    public ApiService(WebClient.Builder webClientBuilder,
-                      ObjectMapper objectMapper) {
-        this.webClientBuilder = webClientBuilder;
-        this.objectMapper = objectMapper;
-    }
+    public UserInfoResponse callExternalApi(long uid) {
+        try {
+            ResponseEntity<UserInfoResponse> responseEntity =
+                enkaClient.getUserInfo(uid, 1L);
+            UserInfoResponse response = responseEntity.getBody();
 
-    public Mono<UserInfoResponse> callExternalApi(long uid) {
-        return webClientBuilder.build()
-            .get()
-            .uri("https://enka.network/api/uid/" + uid + "?info")
-            .retrieve()
-            .bodyToMono(UserInfoResponse.class)
-            .doOnNext(response -> log.info("API Response: {}", response))
-            .doOnError(error -> log.error("API Error: {}", error.getMessage()));
+            if (response != null) {
+                log.info("API Response: {}", response);
+                return response;
+            }
+            else {
+                log.warn("API Response is null");
+                throw new RuntimeException("API Response is null");
+            }
+        }
+        catch (Exception e) {
+            log.error("API Error: {}", e.getMessage(), e);
+            throw new RuntimeException("External API call failed", e);
+        }
     }
 
     // 이미지 id를 경로로 반환
@@ -53,7 +58,7 @@ public class ApiService {
             return "https://enka.network/ui/" + iconPath + ".png";
         }
         catch (IOException e) {
-            e.printStackTrace();
+            log.error("IOException occurred while reading profile pictures: {}", e.getMessage(), e);
             throw new RuntimeException("프로필 사진을 불러오는데 실패했습니다.", e);
         }
     }
