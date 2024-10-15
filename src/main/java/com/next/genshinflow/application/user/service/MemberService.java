@@ -30,19 +30,19 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
-    private final EnkaService apiService;
+    private final EnkaService enkaService;
 
      //회원가입시 uid, email, pw 입력칸만 있음
      //입력 받은 uid로 유저 정보를 가져오는 로직 필요함
     public MemberResponse createMember(SignUpRequest signUpRequest) {
         verifyExistEmail(signUpRequest.getEmail());
 
-        UserInfoResponse apiResponse = apiService.callExternalApi(signUpRequest.getUid());
+        UserInfoResponse apiResponse = enkaService.callExternalApi(signUpRequest.getUid());
         if (apiResponse == null || apiResponse.getPlayerInfo() == null) {
             throw new RuntimeException("Failed to fetch user info from external API");
         }
 
-        String profileImgPath = apiService.getIconPathForProfilePicture(apiResponse.getPlayerInfo().getProfilePicture().getId());
+        String profileImgPath = enkaService.getIconPathForProfilePicture(apiResponse.getPlayerInfo().getProfilePicture().getId());
         String tower = apiResponse.getPlayerInfo().getTowerFloorIndex()+"-"+apiResponse.getPlayerInfo().getTowerLevelIndex();
 
         MemberEntity member = MemberEntity.builder()
@@ -74,7 +74,7 @@ public class MemberService {
 
         MemberEntity findMember = findMember(loginRequest.getEmail());
 
-        UserInfoResponse apiResponse = apiService.callExternalApi(findMember.getUid());
+        UserInfoResponse apiResponse = enkaService.callExternalApi(findMember.getUid());
         if (apiResponse == null || apiResponse.getPlayerInfo() == null) {
             throw new RuntimeException("Failed to fetch user info from external API");
         }
