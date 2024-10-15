@@ -3,7 +3,7 @@ package com.next.genshinflow.intergration.security;
 import com.next.genshinflow.application.user.dto.LoginRequest;
 import com.next.genshinflow.application.user.dto.SignUpRequest;
 import com.next.genshinflow.application.user.dto.UserInfoResponse;
-import com.next.genshinflow.application.user.service.ApiService;
+import com.next.genshinflow.application.user.service.EnkaService;
 import com.nimbusds.jose.shaded.gson.Gson;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Mono;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -30,7 +29,7 @@ public class SecurityTests {
     private MockMvc mockMvc;
 
     @MockBean
-    private ApiService apiService;
+    private EnkaService enkaService;
 
     private static final long UID = 12345678L;
     private static final String EMAIL = "test@gmail.com";
@@ -45,8 +44,8 @@ public class SecurityTests {
         mockApiResponse.setPlayerInfo(new UserInfoResponse
             .PlayerInfo("닉네임", 50, 8, 10, 2, new UserInfoResponse.ProfilePicture(100)));
 
-        when(apiService.callExternalApi(UID)).thenReturn(Mono.just(mockApiResponse));
-        when(apiService.getIconPathForProfilePicture(100)).thenReturn("https://enka.network/ui/someIcon.png");
+        when(enkaService.callExternalApi(UID)).thenReturn(mockApiResponse);
+        when(enkaService.getIconPathForProfilePicture(100)).thenReturn("https://enka.network/ui/someIcon.png");
 
         SignUpRequest signUpRequest = SignUpRequest.builder()
             .uid(UID)
