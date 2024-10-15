@@ -30,14 +30,14 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
-    private final ApiService apiService;
+    private final EnkaService apiService;
 
      //회원가입시 uid, email, pw 입력칸만 있음
      //입력 받은 uid로 유저 정보를 가져오는 로직 필요함
     public MemberResponse createMember(SignUpRequest signUpRequest) {
         verifyExistEmail(signUpRequest.getEmail());
 
-        UserInfoResponse apiResponse = apiService.callExternalApi(signUpRequest.getUid()).block();
+        UserInfoResponse apiResponse = apiService.callExternalApi(signUpRequest.getUid());
         if (apiResponse == null || apiResponse.getPlayerInfo() == null) {
             throw new RuntimeException("Failed to fetch user info from external API");
         }
@@ -74,7 +74,7 @@ public class MemberService {
 
         MemberEntity findMember = findMember(loginRequest.getEmail());
 
-        UserInfoResponse apiResponse = apiService.callExternalApi(findMember.getUid()).block();
+        UserInfoResponse apiResponse = apiService.callExternalApi(findMember.getUid());
         if (apiResponse == null || apiResponse.getPlayerInfo() == null) {
             throw new RuntimeException("Failed to fetch user info from external API");
         }
