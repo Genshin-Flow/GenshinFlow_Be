@@ -7,14 +7,8 @@ import com.next.genshinflow.enumeration.QuestCategory;
 import com.next.genshinflow.enumeration.Region;
 import com.next.genshinflow.enumeration.converter.QuestCategoryConverter;
 import com.next.genshinflow.enumeration.converter.RegionConverter;
-import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import org.hibernate.annotations.Comment;
 
@@ -29,7 +23,7 @@ public class PostEntity extends BaseEntity {
     private Long id;
 
     @ManyToOne
-    @Column
+    @JoinColumn(name = "writer_id")
     private MemberEntity writer;
 
     @Column(length = 20)
