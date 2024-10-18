@@ -2,8 +2,8 @@ package com.next.genshinflow.application.user.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.next.genshinflow.application.user.dto.ProfileImgDataResponse;
-import com.next.genshinflow.application.user.dto.UserInfoResponse;
+import com.next.genshinflow.application.user.dto.enkaApi.ProfileImgDataResponse;
+import com.next.genshinflow.application.user.dto.enkaApi.UserInfoResponse;
 import com.next.genshinflow.infrastructure.EnkaClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
