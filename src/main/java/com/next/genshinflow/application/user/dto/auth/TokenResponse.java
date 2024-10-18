@@ -1,4 +1,4 @@
-package com.next.genshinflow.application.user.dto;
+package com.next.genshinflow.application.user.dto.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

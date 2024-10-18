@@ -1,14 +1,12 @@
-package com.next.genshinflow.application.user.dto;
+package com.next.genshinflow.application.user.dto.auth;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -21,6 +19,10 @@ public class SignUpRequest {
     @Email
     @NotBlank
     private String email;
+
+    @Schema(description = "이메일 인증 번호", type = "String", example = "199494")
+    @NotEmpty(message = "인증 번호를 입력해 주세요")
+    private String authNum;
 
     @Schema(description = "사용자 비밀번호", type = "String", example = "example1234!")
     @NotBlank
