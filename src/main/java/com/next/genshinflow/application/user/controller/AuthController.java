@@ -1,6 +1,11 @@
 package com.next.genshinflow.application.user.controller;
 
 import com.next.genshinflow.application.user.dto.*;
+import com.next.genshinflow.application.user.dto.auth.LoginRequest;
+import com.next.genshinflow.application.user.dto.auth.SignUpRequest;
+import com.next.genshinflow.application.user.dto.auth.TokenResponse;
+import com.next.genshinflow.application.user.dto.mailAuthentication.MailRequest;
+import com.next.genshinflow.application.user.service.MailSendService;
 import com.next.genshinflow.application.user.service.MemberService;
 import com.next.genshinflow.domain.utils.UriCreator;
 import com.next.genshinflow.security.jwt.JwtFilter;
@@ -21,6 +26,7 @@ import java.net.URI;
 @RequestMapping("/auth")
 public class AuthController {
     private final MemberService memberService;
+    private final MailSendService mailSendService;
 
     @Operation(summary = "회원가입", description = "이메일과 비밀번호로 회원 가입 처리")
     @PostMapping("/signup")
@@ -51,5 +57,11 @@ public class AuthController {
         TokenResponse tokenResponse = memberService.refreshAccessToken(refreshToken);
 
         return ResponseEntity.ok(tokenResponse);
+    }
+
+    @Operation(summary = "인증코드 발송", description = "입력된 이메일로 인증코드를 발송함")
+    @PostMapping("/mailSend")
+    public String mailSend(@RequestBody @Valid MailRequest mailRequest) {
+        return mailSendService.joinEmail(mailRequest.getEmail());
     }
 }
