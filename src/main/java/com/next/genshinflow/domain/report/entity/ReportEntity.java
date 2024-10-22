@@ -3,9 +3,7 @@ package com.next.genshinflow.domain.report.entity;
 import com.next.genshinflow.domain.BaseEntity;
 import com.next.genshinflow.domain.user.entity.MemberEntity;
 import com.next.genshinflow.enumeration.ReportStatus;
-import com.next.genshinflow.enumeration.converter.ReportStatusConverter;
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -34,7 +32,6 @@ public class ReportEntity extends BaseEntity {
     @Column
     private String content;
 
-    @Convert(converter = ReportStatusConverter.class)
     @Column
     private ReportStatus status;
 }

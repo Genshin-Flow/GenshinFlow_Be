@@ -1,21 +1,25 @@
 package com.next.genshinflow.application.user.mapper;
 
-import com.next.genshinflow.application.user.dto.ChangePasswordRequest;
-import com.next.genshinflow.application.user.dto.MyPageRequest;
-import com.next.genshinflow.application.user.dto.SignUpRequest;
-import com.next.genshinflow.application.user.response.MemberResponse;
+import com.next.genshinflow.application.user.dto.*;
 import com.next.genshinflow.domain.user.entity.MemberEntity;
 
-import java.util.List;
+public class MemberMapper {
 
-public interface MemberMapper {
-    MemberEntity postToMember(SignUpRequest signUpRequest);
+    private MemberMapper() {}
 
-    MemberEntity patchToMember(MyPageRequest myPageRequest);
+    public static MemberResponse memberToResponse(MemberEntity member) {
+        if (member == null) return null;
 
-    MemberEntity patchToPassword(ChangePasswordRequest passwordRequest);
-
-    MemberResponse memberToResponse(MemberEntity memberEntity);
-
-    List<MemberResponse> membersToResponses(List<MemberEntity> memberEntities);
+        return MemberResponse.builder()
+            .uid(member.getUid())
+            .name(member.getName())
+            .email(member.getEmail())
+            .image(member.getImage())
+            .level(member.getLevel())
+            .worldLevel(member.getWorldLevel())
+            .towerLevel(member.getTowerLevel())
+            .status(member.getStatus())
+            .role(member.getRole())
+            .build();
+    }
 }

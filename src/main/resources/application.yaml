@@ -21,3 +21,12 @@ spring:
     console:
       enabled: true
       path: /h2
+
+jwt:
+  header: Authorization
+  secret: ${JWT_SECRET_KEY}
+  token-validity-in-seconds: 86400
+  refresh-token-validity-in-seconds: 604800
+
+enka:
+  host: https://enka.network

@@ -41,6 +41,9 @@ public class Posting extends BaseEntity {
     @JoinColumn(name = "writer_id")
     private MemberEntity writer;
 
+    @Column(length = 20)
+    private String title;
+
 // TODO: FE 단에서 uid 만 내려줄 때 이름/이미지 가져올 수 있는지 문의할 것
 //       가능할 경우, AssignerResponse / mapper 수정할 것
 //
