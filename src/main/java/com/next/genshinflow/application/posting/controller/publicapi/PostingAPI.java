@@ -6,7 +6,7 @@ import com.next.genshinflow.application.posting.request.PostingDeleteRequest;
 import com.next.genshinflow.application.posting.request.PostingModifyRequest;
 import com.next.genshinflow.application.posting.request.PostingPullUpRequest;
 import com.next.genshinflow.application.posting.response.PostingResponse;
-import com.next.genshinflow.application.user.response.MemberResponse;
+import com.next.genshinflow.application.user.dto.MemberResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Pageable;

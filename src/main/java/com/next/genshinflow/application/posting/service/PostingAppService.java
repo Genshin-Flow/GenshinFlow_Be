@@ -7,7 +7,7 @@ import com.next.genshinflow.application.posting.request.PostingDeleteRequest;
 import com.next.genshinflow.application.posting.request.PostingModifyRequest;
 import com.next.genshinflow.application.posting.request.PostingPullUpRequest;
 import com.next.genshinflow.application.posting.response.PostingResponse;
-import com.next.genshinflow.application.user.response.MemberResponse;
+import com.next.genshinflow.application.user.dto.MemberResponse;
 import com.next.genshinflow.domain.posting.Posting;
 import com.next.genshinflow.domain.posting.PostingService;
 import com.next.genshinflow.domain.user.entity.MemberEntity;
@@ -46,7 +46,7 @@ public class PostingAppService {
     }
 
     private boolean judgeEditable(MemberResponse member, Posting target) {
-        return member != null && target.getUid() == member.uid();
+        return member != null && target.getUid() == member.getUid();
     }
 
     @Transactional
@@ -63,7 +63,7 @@ public class PostingAppService {
         PostingCreateRequest request,
         MemberResponse member
     ) {
-        MemberEntity writer = memberRepository.findById(member.id())
+        MemberEntity writer = memberRepository.findById(member.getId())
             .orElseThrow(() -> new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND));
 
         Posting posting = PostingMapper.from(request, writer, null);
@@ -90,7 +90,7 @@ public class PostingAppService {
         PostingModifyRequest request,
         MemberResponse member
     ) {
-        MemberEntity writer = memberRepository.findById(member.id())
+        MemberEntity writer = memberRepository.findById(member.getId())
             .orElseThrow(() -> new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND));
 
         Posting posting = PostingMapper.from(request, writer, null);
@@ -114,7 +114,7 @@ public class PostingAppService {
         PostingDeleteRequest request,
         MemberResponse member
     ) {
-        postingService.deleteMemberPosting(request.postingId(), member.id());
+        postingService.deleteMemberPosting(request.postingId(), member.getId());
     }
 
     @Transactional
@@ -133,7 +133,7 @@ public class PostingAppService {
         PostingPullUpRequest request,
         MemberResponse member
     ) {
-        Posting posting = postingService.pullUpMemberPosting(request.postingId(), member.id());
+        Posting posting = postingService.pullUpMemberPosting(request.postingId(), member.getId());
         return PostingMapper.toResponse(posting, true);
     }
 }
