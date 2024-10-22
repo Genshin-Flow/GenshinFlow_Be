@@ -40,7 +40,7 @@ public class MemberService {
      //회원가입시 uid, email, pw 입력칸만 있음
      //입력 받은 uid로 유저 정보를 가져오는 로직 필요함
     public MemberResponse createMember(SignUpRequest signUpRequest) {
-        mailSendService.checkAuthNum(signUpRequest.getEmail(), signUpRequest.getAuthNum());
+        mailSendService.verifyAuthCode(signUpRequest.getEmail(), signUpRequest.getAuthNum());
         verifyExistEmail(signUpRequest.getEmail());
 
         UserInfoResponse apiResponse = getUserInfoFromApi(signUpRequest.getUid());

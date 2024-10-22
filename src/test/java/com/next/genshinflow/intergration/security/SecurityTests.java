@@ -53,7 +53,7 @@ public class SecurityTests {
         when(enkaService.getIconPathForProfilePicture(100)).thenReturn("https://enka.network/ui/someIcon.png");
 
         // MailSendService의 인증번호 확인 로직을 Mock 처리
-        doNothing().when(mailSendService).checkAuthNum(EMAIL, AUTH_NUM);
+        doNothing().when(mailSendService).verifyAuthCode(EMAIL, AUTH_NUM);
 
         SignUpRequest signUpRequest = SignUpRequest.builder()
             .uid(UID)
