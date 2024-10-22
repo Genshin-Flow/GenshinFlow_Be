@@ -2,7 +2,7 @@ package com.next.genshinflow.application.user.service;
 
 import com.next.genshinflow.exception.BusinessLogicException;
 import com.next.genshinflow.exception.ExceptionCode;
-import com.next.genshinflow.util.RedisUtil;
+import com.next.genshinflow.domain.user.repository.RedisRepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.AllArgsConstructor;
@@ -14,38 +14,38 @@ import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Random;
+import java.security.SecureRandom;
 
 @Service
 @AllArgsConstructor
 public class MailSendService {
     private JavaMailSender mailSender;
-    private RedisUtil redisUtil;
+    private RedisRepository redisRepository;
     private static final long AUTH_NUM_EXPIRE_TIME = 60L;
 
-    public int makeRandomNum() {
-        Random num = new Random();
+    public int generateAuthCode() {
+        SecureRandom randomGenerator = new SecureRandom();
         StringBuilder randomNum = new StringBuilder();
 
         for (int i = 0; i < 6; i++) {
-            randomNum.append(num.nextInt(10));
+            randomNum.append(randomGenerator.nextInt(10));
         }
 
         return Integer.parseInt(randomNum.toString());
     }
 
-    public String joinEmail(String email) {
-        int authNum = makeRandomNum();
+    public String sendVerificationEmail(String email) {
+        int authNum = generateAuthCode();
         String setFrom = "nextconnect.lab@gmail.com";
         String toMail = email;
         String title = "Genshin Flow 인증코드";
-        String content = readHtmlTemplate().replace("{{authNum}}", Integer.toString(authNum));
+        String content = loadEmailTemplate().replace("{{authNum}}", Integer.toString(authNum));
 
-        mailSend(setFrom, toMail, title, content, authNum);
+        sendEmail(setFrom, toMail, title, content, authNum);
         return Integer.toString(authNum);
     }
 
-    private String readHtmlTemplate() {
+    private String loadEmailTemplate() {
         try {
             ClassPathResource resource = new ClassPathResource("EmailSend.html");
             return new String(Files.readAllBytes(Paths.get(resource.getURI())), StandardCharsets.UTF_8);
@@ -55,7 +55,7 @@ public class MailSendService {
         }
     }
 
-    public void mailSend(String setFrom, String toMail, String title, String content, int authNum) {
+    public void sendEmail(String setFrom, String toMail, String title, String content, int authNum) {
         MimeMessage message = mailSender.createMimeMessage();
 
         try {
@@ -68,15 +68,15 @@ public class MailSendService {
             mailSender.send(message);
         }
         catch (MessagingException e) {
-            throw new RuntimeException("Failed to wend email", e);
+            throw new RuntimeException("Failed to send email", e);
         }
 
         // 인증번호는 1분동안 유효함
-        redisUtil.setDataExpire(Integer.toString(authNum), toMail, AUTH_NUM_EXPIRE_TIME);
+        redisRepository.setDataExpire(Integer.toString(authNum), toMail, AUTH_NUM_EXPIRE_TIME);
     }
 
-    public void checkAuthNum(String email, String authNum) {
-        String storedEmail = redisUtil.getData(authNum);
+    public void verifyAuthCode(String email, String authNum) {
+        String storedEmail = redisRepository.getData(authNum);
 
         if (storedEmail == null && !storedEmail.equals(email)) {
             throw new BusinessLogicException(ExceptionCode.INVALID_AUTH_CODE);
