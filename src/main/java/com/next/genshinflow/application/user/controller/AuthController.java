@@ -60,8 +60,9 @@ public class AuthController {
     }
 
     @Operation(summary = "인증코드 발송", description = "입력된 이메일로 인증코드를 발송함")
-    @PostMapping("/mailSend")
-    public String mailSend(@RequestBody @Valid MailRequest mailRequest) {
-        return mailSendService.joinEmail(mailRequest.getEmail());
+    @PostMapping("/verification-code/send")
+    public ResponseEntity<Void> sendVerificationCode(@RequestBody @Valid MailRequest mailRequest) {
+        mailSendService.sendVerificationEmail(mailRequest.getEmail());
+        return ResponseEntity.noContent().build();
     }
 }
