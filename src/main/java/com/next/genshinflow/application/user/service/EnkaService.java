@@ -21,7 +21,7 @@ public class EnkaService {
     private final EnkaClient enkaClient;
     private final ObjectMapper objectMapper;
 
-    public UserInfoResponse callExternalApi(long uid) {
+    public UserInfoResponse fetchUserInfoFromApi(long uid) {
         try {
             ResponseEntity<UserInfoResponse> responseEntity =
                 enkaClient.getUserInfo(uid, 1L);

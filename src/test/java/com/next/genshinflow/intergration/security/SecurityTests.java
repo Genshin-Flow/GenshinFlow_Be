@@ -49,7 +49,7 @@ public class SecurityTests {
         mockApiResponse.setPlayerInfo(new UserInfoResponse
             .PlayerInfo("닉네임", 50, 8, 10, 2, new UserInfoResponse.ProfilePicture(100)));
 
-        when(enkaService.callExternalApi(UID)).thenReturn(mockApiResponse);
+        when(enkaService.fetchUserInfoFromApi(UID)).thenReturn(mockApiResponse);
         when(enkaService.getIconPathForProfilePicture(100)).thenReturn("https://enka.network/ui/someIcon.png");
 
         // MailSendService의 인증번호 확인 로직을 Mock 처리
