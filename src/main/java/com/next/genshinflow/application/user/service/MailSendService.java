@@ -15,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.SecureRandom;
+import java.time.Duration;
 
 @Service
 @AllArgsConstructor
@@ -72,7 +73,7 @@ public class MailSendService {
         }
 
         // 인증번호는 1분동안 유효함
-        redisRepository.setDataExpire(authNum, toMail, AUTH_NUM_EXPIRE_TIME);
+        redisRepository.setData(authNum, toMail, Duration.ofSeconds(AUTH_NUM_EXPIRE_TIME));
     }
 
     public void verifyAuthCode(String email, String authNum) {

@@ -26,6 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.util.Optional;
 
 @Service
@@ -72,6 +73,8 @@ public class MemberService {
 
         String accessToken = tokenProvider.generateAccessToken(authentication);
         String refreshToken = tokenProvider.generateRefreshToken(authentication);
+
+        redisRepository.setData(loginRequest.getEmail(), refreshToken, Duration.ofDays(7));
 
         return new TokenResponse(accessToken, refreshToken);
     }
