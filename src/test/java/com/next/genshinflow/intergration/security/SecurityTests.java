@@ -64,7 +64,7 @@ public class SecurityTests {
 
         String json = new Gson().toJson(signUpRequest);
 
-        ResultActions resultActions = mockMvc.perform(post("/auth/signup")
+        ResultActions resultActions = mockMvc.perform(post("/auth/sign-up")
             .with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(json));
@@ -84,7 +84,7 @@ public class SecurityTests {
 
         String json = new Gson().toJson(loginRequest);
 
-        ResultActions resultActions = mockMvc.perform((post("/auth/signin")
+        ResultActions resultActions = mockMvc.perform((post("/auth/sign-in")
             .with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(json)));
