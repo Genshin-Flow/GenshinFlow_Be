@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -52,7 +53,7 @@ public class TokenProvider implements InitializingBean {
         }
     }
 
-    public String createToken(Authentication authentication) {
+    public String generateAccessToken(Authentication authentication) {
         String authorities = authentication.getAuthorities().stream()
             .map(GrantedAuthority::getAuthority)
             .collect(Collectors.joining(","));
@@ -69,7 +70,7 @@ public class TokenProvider implements InitializingBean {
     }
 
     // 리프레시 토큰은 인증 정보 재발급에만 사용이 되므로 권한을 포함하고 있지 않아도 됨.
-    public String createRefreshToken(Authentication authentication) {
+    public String generateRefreshToken(Authentication authentication) {
         long now = (new Date()).getTime();
         Date validity = new Date(now + refreshTokenValidityInMilliseconds);
 
@@ -88,15 +89,32 @@ public class TokenProvider implements InitializingBean {
             .parseClaimsJws(token)
             .getBody();
 
-        Collection<? extends GrantedAuthority> authorities =
-            Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
+        Collection<? extends GrantedAuthority> authorities = new ArrayList<>();
+        if (claims.containsKey(AUTHORITIES_KEY)) {
+            authorities = Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
+        }
 
         // User(member) Entity가 아닌 security.core.userdetails의 User임
         User principal = new User(claims.getSubject(), "", authorities);
 
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
+    }
+
+    public Claims getUserInfoFromToken(String token) {
+        try {
+            return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        }
+        // 만료된 경우 Claims에서 정보 추출
+        catch (ExpiredJwtException e) {
+            log.info("Token is expired, retrieving claims from expired token.");
+            return e.getClaims();
+        }
     }
 
     // 검증

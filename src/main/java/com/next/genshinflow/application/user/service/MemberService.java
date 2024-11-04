@@ -8,12 +8,14 @@ import com.next.genshinflow.application.user.dto.enkaApi.UserInfoResponse;
 import com.next.genshinflow.application.user.mapper.MemberMapper;
 import com.next.genshinflow.domain.user.entity.MemberEntity;
 import com.next.genshinflow.domain.user.repository.MemberRepository;
+import com.next.genshinflow.domain.user.repository.RedisRepository;
 import com.next.genshinflow.enumeration.AccountStatus;
 import com.next.genshinflow.enumeration.Role;
 import com.next.genshinflow.exception.BusinessLogicException;
 import com.next.genshinflow.exception.ExceptionCode;
 import com.next.genshinflow.security.jwt.TokenProvider;
 import com.next.genshinflow.security.util.SecurityUtil;
+import io.jsonwebtoken.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,12 +32,13 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 public class MemberService {
+    private final EnkaService enkaService;
+    private final MailSendService mailSendService;
     private final MemberRepository memberRepository;
+    private final RedisRepository redisRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
-    private final EnkaService enkaService;
-    private final MailSendService mailSendService;
 
      //회원가입시 uid, email, pw 입력칸만 있음
      //입력 받은 uid로 유저 정보를 가져오는 로직 필요함
@@ -67,19 +70,26 @@ public class MemberService {
 
         updateMemberIfChanged(findMember, apiResponse);
 
-        String accessToken = tokenProvider.createToken(authentication);
-        String refreshToken = tokenProvider.createRefreshToken(authentication);
+        String accessToken = tokenProvider.generateAccessToken(authentication);
+        String refreshToken = tokenProvider.generateRefreshToken(authentication);
 
         return new TokenResponse(accessToken, refreshToken);
     }
 
-    public TokenResponse refreshAccessToken(String refreshToken) {
-        if (!tokenProvider.validateToken(refreshToken)) {
+    public TokenResponse refreshAccessToken(String accessToken, String refreshToken) throws IOException {
+        if (!tokenProvider.validateToken(accessToken)) {
+            throw new BusinessLogicException(ExceptionCode.INVALID_ACCESS_TOKEN);
+        }
+
+        String email = tokenProvider.getUserInfoFromToken(accessToken).getSubject();
+        String refreshTokenFromRedis = redisRepository.getData(email);
+
+        if (refreshTokenFromRedis == null || !refreshTokenFromRedis.equals(refreshToken)) {
             throw new BusinessLogicException(ExceptionCode.INVALID_REFRESH_TOKEN);
         }
 
-        Authentication authentication = tokenProvider.getAuthentication(refreshToken);
-        String newAccessToken = tokenProvider.createToken(authentication);
+        Authentication authentication = tokenProvider.getAuthentication(accessToken);
+        String newAccessToken = tokenProvider.generateAccessToken(authentication);
 
         return new TokenResponse(newAccessToken, refreshToken);
     }
@@ -114,7 +124,7 @@ public class MemberService {
     }
 
     private UserInfoResponse getUserInfoFromApi(long uid) {
-        UserInfoResponse apiResponse = enkaService.callExternalApi(uid);
+        UserInfoResponse apiResponse = enkaService.fetchUserInfoFromApi(uid);
 
         if (apiResponse == null || apiResponse.getPlayerInfo() == null) {
             throw new BusinessLogicException(ExceptionCode.EXTERNAL_API_ERROR);
