@@ -23,7 +23,7 @@ public class MailSendService {
     private RedisRepository redisRepository;
     private static final long AUTH_NUM_EXPIRE_TIME = 60L;
 
-    public int generateAuthCode() {
+    public String generateAuthCode() {
         SecureRandom randomGenerator = new SecureRandom();
         StringBuilder randomNum = new StringBuilder();
 
@@ -31,36 +31,36 @@ public class MailSendService {
             randomNum.append(randomGenerator.nextInt(10));
         }
 
-        return Integer.parseInt(randomNum.toString());
+        return randomNum.toString();
     }
 
     public String sendVerificationEmail(String email) {
-        int authNum = generateAuthCode();
-        String setFrom = "nextconnect.lab@gmail.com";
+        String authNum = generateAuthCode();
+        String fromMail = "nextconnect.lab@gmail.com";
         String toMail = email;
         String title = "Genshin Flow 인증코드";
-        String content = loadEmailTemplate().replace("{{authNum}}", Integer.toString(authNum));
+        String content = loadEmailTemplate().replace("{{authNum}}", authNum);
 
-        sendEmail(setFrom, toMail, title, content, authNum);
-        return Integer.toString(authNum);
+        sendEmail(fromMail, toMail, title, content, authNum);
+        return authNum;
     }
 
     private String loadEmailTemplate() {
         try {
             ClassPathResource resource = new ClassPathResource("EmailSend.html");
-            return new String(Files.readAllBytes(Paths.get(resource.getURI())), StandardCharsets.UTF_8);
+            return Files.readString(Paths.get(resource.getURI()), StandardCharsets.UTF_8);
         }
         catch (Exception e) {
             throw new RuntimeException("Failed to read HTML template", e);
         }
     }
 
-    public void sendEmail(String setFrom, String toMail, String title, String content, int authNum) {
+    public void sendEmail(String fromMail, String toMail, String title, String content, String authNum) {
         MimeMessage message = mailSender.createMimeMessage();
 
         try {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8");
-            helper.setFrom(setFrom);
+            helper.setFrom(fromMail);
             helper.setTo(toMail);
             helper.setSubject(title);
             helper.setText(content, true);
@@ -72,13 +72,13 @@ public class MailSendService {
         }
 
         // 인증번호는 1분동안 유효함
-        redisRepository.setDataExpire(Integer.toString(authNum), toMail, AUTH_NUM_EXPIRE_TIME);
+        redisRepository.setDataExpire(authNum, toMail, AUTH_NUM_EXPIRE_TIME);
     }
 
     public void verifyAuthCode(String email, String authNum) {
         String storedEmail = redisRepository.getData(authNum);
 
-        if (storedEmail == null && !storedEmail.equals(email)) {
+        if (storedEmail == null || !storedEmail.equals(email)) {
             throw new BusinessLogicException(ExceptionCode.INVALID_AUTH_CODE);
         }
     }
