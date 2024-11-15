@@ -1,4 +1,4 @@
-package com.next.genshinflow.application.user.dto;
+package com.next.genshinflow.application.user.dto.member;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.next.genshinflow.enumeration.AccountStatus;
