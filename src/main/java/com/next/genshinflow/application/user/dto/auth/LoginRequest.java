@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class LoginRequest {
     @Schema(description = "사용자 이메일", type = "String", example = "user@example.com")

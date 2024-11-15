@@ -6,6 +6,8 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class SignUpRequest {
     @Schema(description = "원신 UID", type = "long", example = "1800812993")
