@@ -1,6 +1,11 @@
 package com.next.genshinflow.application.user.controller;
 
 import com.next.genshinflow.application.user.dto.*;
+import com.next.genshinflow.application.user.dto.auth.LoginRequest;
+import com.next.genshinflow.application.user.dto.auth.SignUpRequest;
+import com.next.genshinflow.application.user.dto.auth.TokenResponse;
+import com.next.genshinflow.application.user.dto.mailAuthentication.MailRequest;
+import com.next.genshinflow.application.user.service.MailSendService;
 import com.next.genshinflow.application.user.service.MemberService;
 import com.next.genshinflow.domain.utils.UriCreator;
 import com.next.genshinflow.security.jwt.JwtFilter;
@@ -21,10 +26,18 @@ import java.net.URI;
 @RequestMapping("/auth")
 public class AuthController {
     private final MemberService memberService;
+    private final MailSendService mailSendService;
+
+    @Operation(summary = "인증코드 발송", description = "입력된 이메일로 인증코드를 발송함")
+    @PostMapping("/verification-code/send")
+    public ResponseEntity<Void> sendVerificationCode(@RequestBody @Valid MailRequest mailRequest) {
+        mailSendService.sendVerificationEmail(mailRequest.getEmail());
+        return ResponseEntity.ok().build();
+    }
 
     @Operation(summary = "회원가입", description = "이메일과 비밀번호로 회원 가입 처리")
-    @PostMapping("/signup")
-    public ResponseEntity signUpMember(@Valid @RequestBody SignUpRequest request) {
+    @PostMapping("/sign-up")
+    public ResponseEntity<MemberResponse> signUpMember(@Valid @RequestBody SignUpRequest request) {
         MemberResponse createdMember = memberService.createMember(request);
         URI location = UriCreator.createUri("/member", createdMember.getId());
 
@@ -32,7 +45,7 @@ public class AuthController {
     }
 
     @Operation(summary = "로그인", description = "이메일과 비밀번호로 로그인 처리")
-    @PostMapping("/signin")
+    @PostMapping("/sign-in")
     public ResponseEntity<TokenResponse> signInMember(@Valid @RequestBody LoginRequest loginRequest) {
         TokenResponse tokenResponse = memberService.authenticate(loginRequest);
         HttpHeaders httpHeaders = new HttpHeaders();
@@ -46,9 +59,11 @@ public class AuthController {
         description = "리프레시 토큰을 이용해 만료된 액세스 토큰을 갱신함."
     )
     @PostMapping("/refresh")
-    public ResponseEntity<TokenResponse> refreshAccessToken(@RequestHeader("Authorization") String refreshTokenHeader) {
+    public ResponseEntity<TokenResponse> refreshAccessToken(@RequestHeader("AccessToken") String accessTokenHeader,
+                                                            @RequestHeader("RefreshToken") String refreshTokenHeader) {
+        String accessToken = accessTokenHeader.replace("Bearer ", "");
         String refreshToken = refreshTokenHeader.replace("Bearer ", "");
-        TokenResponse tokenResponse = memberService.refreshAccessToken(refreshToken);
+        TokenResponse tokenResponse = memberService.refreshAccessToken(accessToken, refreshToken);
 
         return ResponseEntity.ok(tokenResponse);
     }

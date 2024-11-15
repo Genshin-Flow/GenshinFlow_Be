@@ -25,11 +25,11 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Transactional
     public UserDetails loadUserByUsername(final String email) {
         return memberRepository.findByEmail(email)
-            .map(member -> createMember(member))
+            .map(this::createUserDetails)
             .orElseThrow(() -> new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND));
     }
 
-    private org.springframework.security.core.userdetails.User createMember(MemberEntity member) {
+    private org.springframework.security.core.userdetails.User createUserDetails(MemberEntity member) {
         GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(member.getRole());
 
         return new org.springframework.security.core.userdetails.User(

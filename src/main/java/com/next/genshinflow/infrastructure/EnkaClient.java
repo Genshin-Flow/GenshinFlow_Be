@@ -1,6 +1,6 @@
 package com.next.genshinflow.infrastructure;
 
-import com.next.genshinflow.application.user.dto.UserInfoResponse;
+import com.next.genshinflow.application.user.dto.enkaApi.UserInfoResponse;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
