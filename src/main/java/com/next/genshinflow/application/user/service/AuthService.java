@@ -49,7 +49,7 @@ public class AuthService {
 
         UserInfoResponse apiResponse = getUserInfoFromApi(signUpRequest.getUid());
 
-        MemberEntity member = buildMemberEntity(signUpRequest, apiResponse);
+        MemberEntity member = buildMemberEntity(signUpRequest, apiResponse, Role.USER);
         MemberEntity savedMember = memberRepository.save(member);
 
         return MemberMapper.memberToResponse(savedMember);
@@ -82,7 +82,7 @@ public class AuthService {
 
         UserInfoResponse apiResponse = getUserInfoFromApi(signUpRequest.getUid());
 
-        MemberEntity member = buildOAuthMemberEntity(signUpRequest, apiResponse);
+        MemberEntity member = buildOAuthMemberEntity(signUpRequest, apiResponse, Role.OAUTH_USER);
         MemberEntity savedMember = memberRepository.save(member);
 
         return MemberMapper.memberToResponse(savedMember);
@@ -91,6 +91,10 @@ public class AuthService {
     // OAuth 로그인
     public TokenResponse authenticateWithOAuth(OAuthSignInRequest oAuthLoginRequest, String provider) {
         MemberEntity findMember = findMember(oAuthLoginRequest.getEmail());
+
+        if (findMember.getRole() != Role.OAUTH_USER) {
+            throw new BusinessLogicException(ExceptionCode.USER_CANNOT_LOGIN_WITH_OAUTH);
+        }
 
         List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
         Map<String, Object> attributes = Map.of("email", findMember.getEmail());
@@ -201,15 +205,23 @@ public class AuthService {
         }
     }
 
-    private MemberEntity buildMemberEntity(SignUpRequest signUpRequest, UserInfoResponse apiResponse) {
-        return buildMemberEntity(signUpRequest.getUid(), signUpRequest.getEmail(), signUpRequest.getPassword(), apiResponse);
+    private MemberEntity buildMemberEntity(
+        SignUpRequest signUpRequest,
+        UserInfoResponse apiResponse,
+        Role role) {
+
+        return buildMemberEntity(signUpRequest.getUid(), signUpRequest.getEmail(), signUpRequest.getPassword(), apiResponse, role);
     }
 
-    private MemberEntity buildOAuthMemberEntity(OAuthSignUpRequest signUpRequest, UserInfoResponse apiResponse) {
-        return buildMemberEntity(signUpRequest.getUid(), signUpRequest.getEmail(), null, apiResponse);
+    private MemberEntity buildOAuthMemberEntity(
+        OAuthSignUpRequest signUpRequest,
+        UserInfoResponse apiResponse,
+        Role role) {
+
+        return buildMemberEntity(signUpRequest.getUid(), signUpRequest.getEmail(), null, apiResponse, role);
     }
 
-    private MemberEntity buildMemberEntity(long uid, String email, String password, UserInfoResponse apiResponse) {
+    private MemberEntity buildMemberEntity(long uid, String email, String password, UserInfoResponse apiResponse, Role role) {
         String profileImgPath = enkaService.getIconPathForProfilePicture(apiResponse.getPlayerInfo().getProfilePicture().getId());
         String tower = apiResponse.getPlayerInfo().getTowerFloorIndex() + "-" + apiResponse.getPlayerInfo().getTowerLevelIndex();
 
@@ -222,7 +234,7 @@ public class AuthService {
             .worldLevel(apiResponse.getPlayerInfo().getWorldLevel())
             .towerLevel(tower)
             .status(AccountStatus.ACTIVE_USER)
-            .role(Role.USER.getRole());
+            .role(role);
 
         if (password != null) {
             builder.password(passwordEncoder.encode(password));

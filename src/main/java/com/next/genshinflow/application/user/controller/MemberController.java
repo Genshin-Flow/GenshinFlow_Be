@@ -20,7 +20,7 @@ public class MemberController {
 
     @Operation(summary = "내 정보 조회")
     @GetMapping("/info")
-    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @PreAuthorize("hasAnyRole('USER','OAUTH_USER,'ADMIN')")
     public ResponseEntity<MemberResponse> getMyInfo() {
         return ResponseEntity.ok(memberService.getMyInfo());
     }
@@ -37,7 +37,7 @@ public class MemberController {
 
     @Operation(summary = "UID 변경")
     @PatchMapping("/uid/{memberId}")
-    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @PreAuthorize("hasAnyRole('USER','OAUTH_USER','ADMIN')")
     public ResponseEntity<MemberResponse> updateUid(@PathVariable Long memberId,
                                                     @RequestBody ChangeUidRequest request) {
 
