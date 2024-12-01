@@ -1,7 +1,8 @@
-package com.next.genshinflow.application.user.dto;
+package com.next.genshinflow.application.user.dto.member;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.next.genshinflow.enumeration.AccountStatus;
+import com.next.genshinflow.enumeration.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -39,5 +40,5 @@ public class MemberResponse {
     private AccountStatus status;
 
     @Schema(description = "유저 권한", type = "String", example = "관리자")
-    private String role;
+    private Role role;
 }

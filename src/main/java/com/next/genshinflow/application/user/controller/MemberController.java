@@ -1,6 +1,7 @@
 package com.next.genshinflow.application.user.controller;
 
-import com.next.genshinflow.application.user.dto.MemberResponse;
+import com.next.genshinflow.application.user.dto.member.ChangeUidRequest;
+import com.next.genshinflow.application.user.dto.member.MemberResponse;
 import com.next.genshinflow.application.user.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,7 +20,7 @@ public class MemberController {
 
     @Operation(summary = "내 정보 조회")
     @GetMapping("/info")
-    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @PreAuthorize("hasAnyRole('USER','OAUTH_USER,'ADMIN')")
     public ResponseEntity<MemberResponse> getMyInfo() {
         return ResponseEntity.ok(memberService.getMyInfo());
     }
@@ -32,5 +33,15 @@ public class MemberController {
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<MemberResponse> getUserInfo(@PathVariable Long memberId) {
         return ResponseEntity.ok(memberService.getMemberInfo(memberId));
+    }
+
+    @Operation(summary = "UID 변경")
+    @PatchMapping("/uid/{memberId}")
+    @PreAuthorize("hasAnyRole('USER','OAUTH_USER','ADMIN')")
+    public ResponseEntity<MemberResponse> updateUid(@PathVariable Long memberId,
+                                                    @RequestBody ChangeUidRequest request) {
+
+        MemberResponse updatedMemberResponse = memberService.updateUid(memberId, request.getUid());
+        return ResponseEntity.ok(updatedMemberResponse);
     }
 }

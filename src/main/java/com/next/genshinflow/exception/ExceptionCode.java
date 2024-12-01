@@ -17,7 +17,9 @@ public enum ExceptionCode {
     INVALID_ACCESS_TOKEN(400, "유효하지 않은 액세스 토큰입니다."),
     INVALID_REFRESH_TOKEN(400, "유효하지 않은 리프레시 토큰입니다."),
     INVALID_AUTH_CODE(400, "잘못된 인증 코드입니다."),
-    EXTERNAL_API_ERROR(500, "외부 API 호출에 실패했습니다.");
+    EXTERNAL_API_ERROR(500, "외부 API 호출에 실패했습니다."),
+    SAME_PASSWORD(400, "새 비밀번호는 현재 비밀번호와 같을 수 없습니다."),
+    USER_CANNOT_LOGIN_WITH_OAUTH(403, "일반 유저는 OAuth로 로그인할 수 없습니다.");
 
     private final int status;
     private final String message;

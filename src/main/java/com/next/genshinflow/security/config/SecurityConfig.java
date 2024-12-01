@@ -65,19 +65,6 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
 
-            // 폼 로그인 설정
-            .formLogin(formLogin -> formLogin
-                .loginPage("/auths/login")
-                .loginProcessingUrl("/process_login")
-                .failureUrl("/auths/login?error")
-            )
-
-            // 로그아웃 설정
-            .logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/")
-            )
-
             // URL 인가 설정
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/", "/**").permitAll()

@@ -79,7 +79,10 @@ public class MailSendService {
     public void verifyAuthCode(String email, String authNum) {
         String storedEmail = redisRepository.getData(authNum);
 
-        if (storedEmail == null || !storedEmail.equals(email)) {
+        if (storedEmail.equals(email)) {
+            redisRepository.deleteData(authNum);
+        }
+        else {
             throw new BusinessLogicException(ExceptionCode.INVALID_AUTH_CODE);
         }
     }

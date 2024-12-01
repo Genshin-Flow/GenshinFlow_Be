@@ -13,10 +13,10 @@ public class CorsConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        //모든 출처에 대해 스크립트 기반의 HTTP 통신 허용
-        configuration.setAllowedOrigins(Arrays.asList("*"));
-        //HTTP Method에 대한 HTTP 통신 허용
-        configuration.setAllowedMethods(Arrays.asList("GET","POST","PATCH","DELETE"));
+        configuration.addAllowedOriginPattern("*"); // 모든 출처 허용
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "PUT", "DELETE"));
+        configuration.setAllowedHeaders(Arrays.asList("*")); // 모든 헤더 허용
+        configuration.setAllowCredentials(true); // 자격 증명 허용
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         //모든 URL에 앞서 구성한 CORS 정책을 적용

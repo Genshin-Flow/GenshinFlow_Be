@@ -1,6 +1,6 @@
 package com.next.genshinflow.application.user.mapper;
 
-import com.next.genshinflow.application.user.dto.*;
+import com.next.genshinflow.application.user.dto.member.MemberResponse;
 import com.next.genshinflow.domain.user.entity.MemberEntity;
 
 public class MemberMapper {

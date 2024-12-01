@@ -38,6 +38,9 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
     implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
+    // OAuth2 Client
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
     // db
     implementation 'io.hypersistence:hypersistence-utils-hibernate-60:3.4.1'
     runtimeOnly 'com.h2database:h2'

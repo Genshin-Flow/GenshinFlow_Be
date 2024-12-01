@@ -47,7 +47,7 @@ public class EnkaService {
         try {
             InputStream inputStream = getClass().getResourceAsStream("/api_profile_pictures.json");
             List<ProfileImgDataResponse> profileImgDataResponses = objectMapper
-                .readValue(inputStream, new TypeReference<List<ProfileImgDataResponse>>() {});
+                .readValue(inputStream, new TypeReference<>() {});
 
             String iconPath = profileImgDataResponses.stream()
                 .filter(p -> p.getPriority() == profilePictureId)
