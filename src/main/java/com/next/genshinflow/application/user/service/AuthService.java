@@ -43,6 +43,7 @@ public class AuthService {
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
+    // 일반 유저 회원가입
     public MemberResponse createMember(SignUpRequest signUpRequest) {
         mailSendService.verifyAuthCode(signUpRequest.getEmail(), signUpRequest.getAuthNum());
         verifyExistEmail(signUpRequest.getEmail());
@@ -55,6 +56,7 @@ public class AuthService {
         return MemberMapper.memberToResponse(savedMember);
     }
 
+    // 일반 유저 로그인
     public TokenResponse authenticate(LoginRequest loginRequest) {
         UsernamePasswordAuthenticationToken authenticationToken =
             new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword());
@@ -66,7 +68,7 @@ public class AuthService {
         MemberEntity findMember = findMember(loginRequest.getEmail());
         UserInfoResponse apiResponse = getUserInfoFromApi(findMember.getUid());
 
-        updateMemberIfChanged(findMember, apiResponse);
+        updateMemberIfPlayerInfoChanged(findMember, apiResponse);
 
         String accessToken = tokenProvider.generateAccessToken(authentication);
         String refreshToken = tokenProvider.generateRefreshToken(authentication);
@@ -106,7 +108,7 @@ public class AuthService {
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
         UserInfoResponse apiResponse = getUserInfoFromApi(findMember.getUid());
-        updateMemberIfChanged(findMember, apiResponse);
+        updateMemberIfPlayerInfoChanged(findMember, apiResponse);
 
         String accessToken = tokenProvider.generateAccessToken(authenticationToken);
         String refreshToken = tokenProvider.generateRefreshToken(authenticationToken);
@@ -116,6 +118,7 @@ public class AuthService {
         return new TokenResponse(accessToken, refreshToken);
     }
 
+    // 리프레시 토큰을 통한 액세스 토큰 재발급
     public TokenResponse refreshAccessToken(String accessToken, String refreshToken) throws IOException {
         if (!tokenProvider.validateToken(accessToken)) {
             throw new BusinessLogicException(ExceptionCode.INVALID_ACCESS_TOKEN);
@@ -134,6 +137,7 @@ public class AuthService {
         return new TokenResponse(newAccessToken, refreshToken);
     }
 
+    // 일반 유저 비밀번호 변경
     public void changePassword(String email, String authNum, String password) {
         MemberEntity member = findMember(email);
         mailSendService.verifyAuthCode(email, authNum);
@@ -144,8 +148,6 @@ public class AuthService {
 
         member.setPassword(passwordEncoder.encode(password));
         memberRepository.save(member);
-
-        log.info("Password changed for member: {}", member.getEmail());
     }
 
     // 이메일 검증
@@ -167,6 +169,7 @@ public class AuthService {
                 new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND));
     }
 
+    // 원신 api 유저 정보 요청
     public UserInfoResponse getUserInfoFromApi(long uid) {
         UserInfoResponse apiResponse = enkaService.fetchUserInfoFromApi(uid);
 
@@ -176,7 +179,8 @@ public class AuthService {
         return apiResponse;
     }
 
-    public void updateMemberIfChanged(MemberEntity member, UserInfoResponse apiResponse) {
+    // 받아온 api를 조회해 변경된 유저 정보가 있으면 업데이트
+    public void updateMemberIfPlayerInfoChanged(MemberEntity member, UserInfoResponse apiResponse) {
         UserInfoResponse.PlayerInfo playerInfo = apiResponse.getPlayerInfo();
         if (playerInfo == null) return;
         boolean isUpdated = false;

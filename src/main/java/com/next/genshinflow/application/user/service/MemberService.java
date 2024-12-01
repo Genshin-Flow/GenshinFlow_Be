@@ -44,7 +44,7 @@ public class MemberService {
         MemberEntity updatedMember = memberRepository.save(findMember);
 
         UserInfoResponse apiResponse = authService.getUserInfoFromApi(uid);
-        authService.updateMemberIfChanged(updatedMember, apiResponse);
+        authService.updateMemberIfPlayerInfoChanged(updatedMember, apiResponse);
 
         return MemberMapper.memberToResponse(updatedMember);
     }

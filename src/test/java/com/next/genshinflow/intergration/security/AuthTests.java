@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-public class SecurityTests {
+public class AuthTests {
     @Autowired
     private MockMvc mockMvc;
 
