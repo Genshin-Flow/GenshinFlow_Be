@@ -7,7 +7,6 @@ import com.next.genshinflow.application.user.mapper.MemberMapper;
 import com.next.genshinflow.domain.user.entity.MemberEntity;
 import com.next.genshinflow.domain.user.repository.MemberRepository;
 import com.next.genshinflow.domain.user.repository.RedisRepository;
-import com.next.genshinflow.enumeration.AccountStatus;
 import com.next.genshinflow.enumeration.Role;
 import com.next.genshinflow.exception.BusinessLogicException;
 import com.next.genshinflow.exception.ExceptionCode;
@@ -27,6 +26,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -50,7 +50,13 @@ public class AuthService {
 
         UserInfoResponse apiResponse = getUserInfoFromApi(signUpRequest.getUid());
 
-        MemberEntity member = buildMemberEntity(signUpRequest, apiResponse, Role.USER);
+        MemberEntity member = buildMemberEntity(
+            signUpRequest.getUid(),
+            signUpRequest.getEmail(),
+            signUpRequest.getPassword(),
+            apiResponse,
+            false);
+
         MemberEntity savedMember = memberRepository.save(member);
 
         return MemberMapper.memberToResponse(savedMember);
@@ -66,9 +72,13 @@ public class AuthService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         MemberEntity findMember = findMember(loginRequest.getEmail());
-        UserInfoResponse apiResponse = getUserInfoFromApi(findMember.getUid());
 
+        // 게임 상의 프로필 정보 변경 시 업데이트
+        UserInfoResponse apiResponse = getUserInfoFromApi(findMember.getUid());
         updateMemberIfPlayerInfoChanged(findMember, apiResponse);
+
+        // 제재 유저일 시 제재 기간 확인 및 복구
+        checkAndUpdateDisciplinaryStatus(findMember.getId());
 
         String accessToken = tokenProvider.generateAccessToken(authentication);
         String refreshToken = tokenProvider.generateRefreshToken(authentication);
@@ -84,7 +94,13 @@ public class AuthService {
 
         UserInfoResponse apiResponse = getUserInfoFromApi(signUpRequest.getUid());
 
-        MemberEntity member = buildOAuthMemberEntity(signUpRequest, apiResponse, Role.OAUTH_USER);
+        MemberEntity member = buildMemberEntity(
+            signUpRequest.getUid(),
+            signUpRequest.getEmail(),
+            null,
+            apiResponse,
+            true);
+
         MemberEntity savedMember = memberRepository.save(member);
 
         return MemberMapper.memberToResponse(savedMember);
@@ -94,7 +110,7 @@ public class AuthService {
     public TokenResponse authenticateWithOAuth(OAuthSignInRequest oAuthLoginRequest, String provider) {
         MemberEntity findMember = findMember(oAuthLoginRequest.getEmail());
 
-        if (findMember.getRole() != Role.OAUTH_USER) {
+        if (!findMember.getOAuthUser()) {
             throw new BusinessLogicException(ExceptionCode.USER_CANNOT_LOGIN_WITH_OAUTH);
         }
 
@@ -107,8 +123,12 @@ public class AuthService {
 
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
+        // 게임 상의 프로필 정보 변경 시 업데이트
         UserInfoResponse apiResponse = getUserInfoFromApi(findMember.getUid());
         updateMemberIfPlayerInfoChanged(findMember, apiResponse);
+
+        // 제재 유저일 시 제재 기간 확인 및 복구
+        checkAndUpdateDisciplinaryStatus(findMember.getId());
 
         String accessToken = tokenProvider.generateAccessToken(authenticationToken);
         String refreshToken = tokenProvider.generateRefreshToken(authenticationToken);
@@ -209,41 +229,34 @@ public class AuthService {
         }
     }
 
-    private MemberEntity buildMemberEntity(
-        SignUpRequest signUpRequest,
-        UserInfoResponse apiResponse,
-        Role role) {
-
-        return buildMemberEntity(signUpRequest.getUid(), signUpRequest.getEmail(), signUpRequest.getPassword(), apiResponse, role);
-    }
-
-    private MemberEntity buildOAuthMemberEntity(
-        OAuthSignUpRequest signUpRequest,
-        UserInfoResponse apiResponse,
-        Role role) {
-
-        return buildMemberEntity(signUpRequest.getUid(), signUpRequest.getEmail(), null, apiResponse, role);
-    }
-
-    private MemberEntity buildMemberEntity(long uid, String email, String password, UserInfoResponse apiResponse, Role role) {
+    private MemberEntity buildMemberEntity(long uid, String email, String password, UserInfoResponse apiResponse, boolean oauth) {
         String profileImgPath = enkaService.getIconPathForProfilePicture(apiResponse.getPlayerInfo().getProfilePicture().getId());
         String tower = apiResponse.getPlayerInfo().getTowerFloorIndex() + "-" + apiResponse.getPlayerInfo().getTowerLevelIndex();
 
-        MemberEntity.MemberEntityBuilder builder = MemberEntity.builder()
-            .uid(uid)
-            .name(apiResponse.getPlayerInfo().getNickname())
-            .email(email)
-            .image(profileImgPath)
-            .level(apiResponse.getPlayerInfo().getLevel())
-            .worldLevel(apiResponse.getPlayerInfo().getWorldLevel())
-            .towerLevel(tower)
-            .status(AccountStatus.ACTIVE_USER)
-            .role(role);
+        MemberEntity member = MemberMapper.toMember(uid, email, apiResponse, profileImgPath, tower, oauth);
 
         if (password != null) {
-            builder.password(passwordEncoder.encode(password));
+            member.setPassword(passwordEncoder.encode(password));
         }
 
-        return builder.build();
+        return member;
+    }
+
+    // 로그인 시 Role 확인 및 복구 로직
+    public void checkAndUpdateDisciplinaryStatus(long userId) {
+        MemberEntity member = findMember(userId);
+        Role currentRole = member.getRole();
+
+        if (!currentRole.isSuspended()) return;
+
+        LocalDateTime disciplineDate = member.getDisciplineDate();
+        LocalDateTime endOfSuspension = disciplineDate.plusDays(currentRole.getSuspensionDays());
+        LocalDateTime currentDate = LocalDateTime.now();
+
+        if (currentDate.isAfter(endOfSuspension)) {
+            member.setRole(Role.USER);
+            member.setDisciplineDate(null);
+            memberRepository.save(member);
+        }
     }
 }
