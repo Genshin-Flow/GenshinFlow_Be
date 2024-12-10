@@ -3,12 +3,17 @@ package com.next.genshinflow.exception;
 
 import lombok.Getter;
 
+@Getter
 public class BusinessLogicException extends RuntimeException {
-    @Getter
-    private ExceptionCode exceptionCode;
+
+    private final ExceptionCode exceptionCode;
 
     public BusinessLogicException(ExceptionCode exceptionCode) {
         super(exceptionCode.getMessage());
         this.exceptionCode = exceptionCode;
+    }
+
+    public int getCode() {
+        return exceptionCode.getCode();
     }
 }
