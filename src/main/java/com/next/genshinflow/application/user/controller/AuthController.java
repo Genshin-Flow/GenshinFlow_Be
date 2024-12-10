@@ -102,7 +102,7 @@ public class AuthController {
 
     @Operation(summary = "비밀번호 변경", description = "이메일 인증(/verification-code/send) 후 유저의 비밀번호 변경")
     @PatchMapping("/change-password")
-    @PreAuthorize("hasAnyRole('USER','OAUTH_USER','ADMIN')")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<Void> changePassword(@RequestBody ChangePasswordRequest request) {
 
         authService.changePassword(request.getEmail(), request.getAuthNum(), request.getPassword());

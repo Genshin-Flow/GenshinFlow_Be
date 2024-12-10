@@ -19,7 +19,11 @@ public enum ExceptionCode {
     INVALID_AUTH_CODE(400, "잘못된 인증 코드입니다."),
     EXTERNAL_API_ERROR(500, "외부 API 호출에 실패했습니다."),
     SAME_PASSWORD(400, "새 비밀번호는 현재 비밀번호와 같을 수 없습니다."),
-    USER_CANNOT_LOGIN_WITH_OAUTH(403, "일반 유저는 OAuth로 로그인할 수 없습니다.");
+    USER_CANNOT_LOGIN_WITH_OAUTH(403, "일반 유저는 OAuth로 로그인할 수 없습니다."),
+    REPORT_NOT_FOUND(404, "신고 항목을 찾을 수 없습니다."),
+    CANNOT_REPORT_YOURSELF(400, "자기 자신을 신고할 수 없습니다."),
+    WARNING_NOT_FOUND(404, "해당 reportId는 경고 내역에 없습니다."),
+    DISCIPLINE_NOT_FOUND(404, "해당 reportId는 제재 내역에 없습니다.");
 
     private final int status;
     private final String message;

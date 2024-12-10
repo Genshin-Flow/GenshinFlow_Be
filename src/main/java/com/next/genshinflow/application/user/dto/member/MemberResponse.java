@@ -1,10 +1,14 @@
 package com.next.genshinflow.application.user.dto.member;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.next.genshinflow.enumeration.AccountStatus;
+import com.next.genshinflow.domain.user.entity.Discipline;
+import com.next.genshinflow.domain.user.entity.Warning;
 import com.next.genshinflow.enumeration.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Builder
@@ -36,9 +40,21 @@ public class MemberResponse {
     @Schema(description = "원신 나선비경", type = "String", example = "12-3")
     private String towerLevel;
 
-    @Schema(description = "유저 상태", type = "enum", example = "활동, 휴먼, 정지, 제재 등")
-    private AccountStatus status;
-
-    @Schema(description = "유저 권한", type = "String", example = "관리자")
+    @Schema(description = "유저 권한", type = "enum", example = "관리자, 유저, 정지")
     private Role role;
+
+    @Schema(description = "OAuth 유저 구분", type = "boolean")
+    private Boolean oAuthUser;
+
+    @Schema(description = "회원가입 날짜", type = "LocalDateTime")
+    private LocalDateTime createdAt;
+
+    @Schema(description = "제재 처리 날짜", type = "LocalDateTime")
+    private LocalDateTime disciplineDate;
+
+    @Schema(description = "제재 기록", type = "List")
+    private List<Discipline> disciplinaryHistory;
+
+    @Schema(description = "경고 기록", type = "List")
+    private List<Warning> warningHistory;
 }

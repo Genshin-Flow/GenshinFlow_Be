@@ -1,17 +1,20 @@
 package com.next.genshinflow.domain.user.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.next.genshinflow.domain.BaseEntity;
-import com.next.genshinflow.enumeration.AccountStatus;
 import com.next.genshinflow.enumeration.Role;
-import com.next.genshinflow.enumeration.converter.AccountStatusConverter;
+import com.next.genshinflow.enumeration.converter.RoleConverter;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
 @Getter
 @Setter
-@Entity
-@Builder
 @Table(name = "member")
 @AllArgsConstructor
 @NoArgsConstructor
@@ -48,9 +51,22 @@ public class MemberEntity extends BaseEntity {
     @Column(name = "towerLevel")
     private String towerLevel;
 
-    @Convert(converter = AccountStatusConverter.class)
-    @Column(name = "status")
-    private AccountStatus status;
-
+    @Convert(converter = RoleConverter.class)
+    @Column(name = "role")
     private Role role;
+
+    @Column(name = "oauth_user")
+    private Boolean oAuthUser;
+
+    @Column(name = "discipline_date")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime disciplineDate;
+
+    @ElementCollection
+    @CollectionTable(name = "member_disciplinary_history", joinColumns = @JoinColumn(name = "member_id"))
+    private List<Discipline> disciplinaryHistory = new ArrayList<>();
+
+    @ElementCollection
+    @CollectionTable(name = "member_warnings", joinColumns = @JoinColumn(name = "member_id"))
+    private List<Warning> warningHistory = new ArrayList<>();
 }
