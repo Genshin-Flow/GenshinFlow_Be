@@ -7,15 +7,15 @@ phases:
   build:
     commands:
       - echo Build Starting on `date`
-      - cd DeployServer
+      - cd GenshinFlow_Be
       - chmod +x ./gradlew
       - ./gradlew build
   post_build:
     commands:
-      - echo $(basename ./DeployServer/build/libs/*.jar)
+      - echo $(basename ./GenshinFlow_Be/build/libs/*.jar)
 artifacts:
   files:
-    - DeployServer/build/libs/*.jar
-    - DeployServer/scripts/**
-    - DeployServer/appspec.yml
+    - GenshinFlow_Be/build/libs/*.jar
+    - GenshinFlow_Be/scripts/**
+    - GenshinFlow_Be/appspec.yml
   discard-paths: yes
