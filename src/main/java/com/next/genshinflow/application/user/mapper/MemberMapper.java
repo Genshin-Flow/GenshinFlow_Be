@@ -29,6 +29,7 @@ public class MemberMapper {
         if (member == null) return null;
 
         return MemberResponse.builder()
+            .id(member.getId())
             .uid(member.getUid())
             .name(member.getName())
             .email(member.getEmail())

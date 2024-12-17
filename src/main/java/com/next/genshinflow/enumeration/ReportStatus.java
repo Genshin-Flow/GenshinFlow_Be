@@ -1,12 +1,12 @@
 package com.next.genshinflow.enumeration;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 public enum ReportStatus {
     PROCESSED("처리됨"),
     UNPROCESSED("처리되지 않음"),

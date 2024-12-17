@@ -14,5 +14,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ReportRepository extends JpaRepository<ReportEntity, Long> {
     Page<ReportEntity> findByReportStatus(ReportStatus reportStatus, Pageable pageable);
-    Page<ReportEntity> findByTargetUser_Id(long targetId, Pageable pageable);
+    Page<ReportEntity> findByTargetUser_Email(String userEmail, Pageable pageable);
 }

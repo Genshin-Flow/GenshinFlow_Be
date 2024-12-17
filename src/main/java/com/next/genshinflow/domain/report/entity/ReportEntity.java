@@ -10,6 +10,9 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+// 현재 제재 상태인 유저는 비회원으로 게시글 작성이 가능함
+// 추후에 유저의 ip를 차단하는 방식으로 변경해야함
+
 @Entity
 @Getter
 @Setter

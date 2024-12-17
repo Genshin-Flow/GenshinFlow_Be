@@ -16,14 +16,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class ReportResponse {
     @Schema(description = "report ID", type = "long", example = "123")
-    @JsonIgnore
     private Long id;
 
-    @Schema(description = "신고를 제기한 사용자", type = "long", example = "123")
-    private Long reportingUserId;
+    @Schema(description = "신고를 제기한 사용자 Email", type = "String", example = "moshi@gmail.com")
+    private String reportingUserEmail;
 
-    @Schema(description = "신고의 대상이 된 사용자", type = "long", example = "123")
-    private Long targetUserId;
+    @Schema(description = "신고의 대상이 된 사용자 Email", type = "String", example = "moshi@gmail.com")
+    private String targetUserEmail;
 
     @Schema(description = "신고 내용", type = "String", example = "상업적/홍보성")
     private String content;

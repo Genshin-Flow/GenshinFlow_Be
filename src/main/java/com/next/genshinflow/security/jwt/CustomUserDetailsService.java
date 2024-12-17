@@ -1,4 +1,4 @@
-package com.next.genshinflow.application.user.service;
+package com.next.genshinflow.security.jwt;
 
 
 import com.next.genshinflow.domain.user.entity.MemberEntity;
