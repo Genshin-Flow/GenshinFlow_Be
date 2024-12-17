@@ -24,7 +24,7 @@ public class MemberController {
     private final MemberService memberService;
 
     @Operation(summary = "내 정보 조회")
-    @GetMapping("/info")
+    @GetMapping("/my-info")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<MemberResponse> getMyInfo() {
         return ResponseEntity.ok(memberService.getMyInfo());
