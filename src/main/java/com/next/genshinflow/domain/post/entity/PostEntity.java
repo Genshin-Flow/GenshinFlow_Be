@@ -1,5 +1,6 @@
 package com.next.genshinflow.domain.post.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.next.genshinflow.domain.BaseEntity;
 import com.next.genshinflow.domain.LocalDateTimeAttributeConverter;
 import com.next.genshinflow.domain.user.entity.MemberEntity;
@@ -10,9 +11,18 @@ import com.next.genshinflow.enumeration.converter.RegionConverter;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.Comment;
 
 @Entity
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "post")
 @Comment("메인 대시보드 post")
 public class PostEntity extends BaseEntity {
@@ -26,33 +36,39 @@ public class PostEntity extends BaseEntity {
     @JoinColumn(name = "writer_id")
     private MemberEntity writer;
 
-    @Column(length = 20)
+    @Column(name = "title", length = 20)
     private String title;
 
-    @Column
+    @Column(name = "uid")
     private Long uid;
 
     @Convert(converter = RegionConverter.class)
-    @Column
+    @Column(name = "region")
     private Region region;
 
     @Convert(converter = QuestCategoryConverter.class)
-    @Column
+    @Column(name = "quest_category")
     private QuestCategory questCategory;
 
-    @Column(nullable = false)
+    @Column(name = "world_level")
     private int worldLevel;
 
-    @Column
+    @Column(name = "content")
     private String content;
 
-    @Column
+    @Column(name = "password")
     private String password;
 
-    @Column(name = "is_deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT false")
-    private boolean deleted;
+    @Column(name = "completed", nullable = false, columnDefinition = "BOOLEAN DEFAULT false")
+    private boolean completed;
 
     @Convert(converter = LocalDateTimeAttributeConverter.class)
-    @Column
+    @Column(name = "completed_at")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime completedAt;
+
+    @Convert(converter = LocalDateTimeAttributeConverter.class)
+    @Column(name = "sorted_at")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime sortedAt;
 }
