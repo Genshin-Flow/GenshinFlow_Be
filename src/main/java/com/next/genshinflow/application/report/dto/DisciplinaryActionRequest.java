@@ -11,9 +11,9 @@ public class DisciplinaryActionRequest {
     @NotNull
     private long reportId;
 
-    @Schema(description = "유저 ID", type = "long")
-    @NotNull
-    private long userId;
+    @Schema(description = "유저 Email", type = "String", example = "moshi@gmail.com")
+    @NotBlank
+    private String userEmail;
 
     @Schema(description = "제재 항목", type = "String", example = "1일 정지")
     @NotBlank

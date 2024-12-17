@@ -24,8 +24,9 @@ public class ReportMapper {
         if (report == null) return null;
 
         return ReportResponse.builder()
-            .reportingUserId(report.getReportingUser().getId())
-            .targetUserId(report.getTargetUser().getId())
+            .id(report.getId())
+            .reportingUserEmail(report.getReportingUser().getEmail())
+            .targetUserEmail(report.getTargetUser().getEmail())
             .content(report.getContent())
             .image(report.getImage())
             .reportStatus(report.getReportStatus())

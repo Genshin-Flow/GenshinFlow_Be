@@ -19,6 +19,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
@@ -170,25 +171,6 @@ public class AuthService {
         memberRepository.save(member);
     }
 
-    // 이메일 검증
-    public void verifyExistEmail(String email) {
-        Optional<MemberEntity> member = memberRepository.findByEmail(email);
-        if (member.isPresent())
-            throw new BusinessLogicException(ExceptionCode.MEMBER_EXISTS);
-    }
-
-    public MemberEntity findMember(String email) {
-        return memberRepository.findByEmail(email)
-            .orElseThrow(() ->
-                new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND));
-    }
-
-    public MemberEntity findMember(long memberId) {
-        return memberRepository.findById(memberId)
-            .orElseThrow(() ->
-                new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND));
-    }
-
     // 원신 api 유저 정보 요청
     public UserInfoResponse getUserInfoFromApi(long uid) {
         UserInfoResponse apiResponse = enkaService.fetchUserInfoFromApi(uid);
@@ -258,5 +240,35 @@ public class AuthService {
             member.setDisciplineDate(null);
             memberRepository.save(member);
         }
+    }
+
+    // 이메일 검증
+    public void verifyExistEmail(String email) {
+        Optional<MemberEntity> member = memberRepository.findByEmail(email);
+        if (member.isPresent())
+            throw new BusinessLogicException(ExceptionCode.MEMBER_EXISTS);
+    }
+
+    public MemberEntity findMember(String email) {
+        return memberRepository.findByEmail(email)
+            .orElseThrow(() ->
+                new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND));
+    }
+
+    public MemberEntity findMember(long memberId) {
+        return memberRepository.findById(memberId)
+            .orElseThrow(() ->
+                new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND));
+    }
+
+    // 로그인한 사용자 추출
+    public MemberEntity getCurrentMember() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.getPrincipal() instanceof User user) {
+            return findMember(user.getUsername());
+        }
+
+        return null;
     }
 }

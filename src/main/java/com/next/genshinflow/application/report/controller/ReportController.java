@@ -30,37 +30,40 @@ public class ReportController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "신고 내역 전체 조회")
+    @Operation(summary = "신고 내역 전체 조회", description = "size = 15")
     @GetMapping("/report/history")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<List<ReportResponse>> getAllReports(
         @Positive @RequestParam(value = "page", defaultValue = "1") int page,
-        @Positive @RequestParam(value = "size", defaultValue = "15") int size) {
-
-        Page<ReportResponse> reportPage = reportService.getAllReports(page-1, size);
-        return ResponseEntity.ok(reportPage.getContent());
+        @Positive @RequestParam(value = "size", defaultValue = "15") int size
+    ) {
+        Page<ReportResponse> reportHistory = reportService.getAllReports(page-1, size);
+        return ResponseEntity.ok(reportHistory.getContent());
     }
 
-    @Operation(summary = "상태별 신고 내역 전체 조회",description = "status: PROCESSED(NO_ACTION_NEEDED), UNPROCESSED")
+    @Operation(
+        summary = "상태별 신고 내역 전체 조회",
+        description = "status = PROCESSED(NO_ACTION_NEEDED), UNPROCESSED / size = 15"
+    )
     @GetMapping("/report/history/{status}")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<List<ReportResponse>> getReportsByStatus(
         @PathVariable String status,
         @Positive @RequestParam(value = "page", defaultValue = "1") int page,
-        @Positive @RequestParam(value = "size", defaultValue = "15") int size) {
-
-        Page<ReportResponse> reportPage = reportService.getReportsByStatus(status, page-1, size);
-        return ResponseEntity.ok(reportPage.getContent());
+        @Positive @RequestParam(value = "size", defaultValue = "15") int size
+    ) {
+        Page<ReportResponse> reportHistory = reportService.getReportsByStatus(status, page-1, size);
+        return ResponseEntity.ok(reportHistory.getContent());
     }
 
-    @Operation(summary = "유저 신고 내역 조회")
-    @GetMapping("/report/{userId}/history")
+    @Operation(summary = "유저 신고 내역 조회", description = "size = 20")
+    @GetMapping("/report/{userEmail}/history")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<List<ReportResponse>> getUserReportHistory(@PathVariable long userId,
+    public ResponseEntity<List<ReportResponse>> getUserReportHistory(@PathVariable String userEmail,
                                                @Positive @RequestParam(value = "page", defaultValue = "1") int page,
-                                               @Positive @RequestParam(value = "size", defaultValue = "20") int size) {
-
-        Page<ReportResponse> reportHistory = reportService.getUserReportHistory(userId, page-1, size);
+                                               @Positive @RequestParam(value = "size", defaultValue = "20") int size
+    ) {
+        Page<ReportResponse> reportHistory = reportService.getUserReportHistory(userEmail, page-1, size);
         return ResponseEntity.ok(reportHistory.getContent());
     }
 
@@ -106,20 +109,20 @@ public class ReportController {
     }
 
     @Operation(summary = "유저 경고 내역 확인")
-    @GetMapping("/penalty/warning/{userId}")
+    @GetMapping("/penalty/warning/{userEmail}")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<List<Warning>> getUserWarningHistory(@PathVariable long userId) {
+    public ResponseEntity<List<Warning>> getUserWarningHistory(@PathVariable String userEmail) {
 
-        List<Warning> warningHistory = reportService.getUserWarningHistory(userId);
+        List<Warning> warningHistory = reportService.getUserWarningHistory(userEmail);
         return ResponseEntity.ok(warningHistory);
     }
 
     @Operation(summary = "유저 제재 내역 확인")
-    @GetMapping("/penalty/discipline/{userId}")
+    @GetMapping("/penalty/discipline/{userEmail}")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<List<Discipline>> getUserDisciplineHistory(@PathVariable long userId) {
+    public ResponseEntity<List<Discipline>> getUserDisciplineHistory(@PathVariable String userEmail) {
 
-        List<Discipline> disciplineHistory = reportService.getUserDisciplineHistory(userId);
+        List<Discipline> disciplineHistory = reportService.getUserDisciplineHistory(userEmail);
         return ResponseEntity.ok(disciplineHistory);
     }
 }
