@@ -34,23 +34,24 @@ public class ReportService {
 
     // 신고 생성
     public void createReport(CreateReportRequest reportRequest) {
-        if (reportRequest.getReportingUserId().equals(reportRequest.getTargetUserId())) {
+        MemberEntity member = authService.getCurrentMember();
+
+        if (member.getEmail().equals(reportRequest.getTargetUserEmail())) {
             throw new BusinessLogicException(ExceptionCode.CANNOT_REPORT_YOURSELF);
         }
 
-        MemberEntity reportingUser = authService.findMember(reportRequest.getReportingUserId());
-        MemberEntity targetUser = authService.findMember(reportRequest.getTargetUserId());
+        MemberEntity targetUser = authService.findMember(reportRequest.getTargetUserEmail());
 
-        ReportEntity report = ReportMapper.toReport(reportRequest, reportingUser, targetUser);
+        ReportEntity report = ReportMapper.toReport(reportRequest, member, targetUser);
         reportRepository.save(report);
     }
 
     // 모든 신고 내역 조회
     public Page<ReportResponse> getAllReports(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
-        Page<ReportEntity> reportPage = reportRepository.findAll(pageable);
+        Page<ReportEntity> historyPage = reportRepository.findAll(pageable);
 
-        return reportPage.map(ReportMapper::reportToResponse);
+        return historyPage.map(ReportMapper::reportToResponse);
     }
 
     // 상태별 신고 내역 조회
@@ -58,15 +59,15 @@ public class ReportService {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
 
         ReportStatus reportStatus = ReportStatus.fromString(status);
-        Page<ReportEntity> reportPage = reportRepository.findByReportStatus(reportStatus, pageable);
+        Page<ReportEntity> historyPage = reportRepository.findByReportStatus(reportStatus, pageable);
 
-        return reportPage.map(ReportMapper::reportToResponse);
+        return historyPage.map(ReportMapper::reportToResponse);
     }
 
     // 유저 신고 내역 조회
-    public Page<ReportResponse> getUserReportHistory(long userId, int page, int size) {
+    public Page<ReportResponse> getUserReportHistory(String userEmail, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
-        Page<ReportEntity> historyPage = reportRepository.findByTargetUser_Id(userId, pageable);
+        Page<ReportEntity> historyPage = reportRepository.findByTargetUser_Email(userEmail, pageable);
 
         return historyPage.map(ReportMapper::reportToResponse);
     }
@@ -88,7 +89,7 @@ public class ReportService {
 
     // 유저 경고
     public void recordUserWarning(UserWarningRequest request) {
-        MemberEntity member = authService.findMember(request.getUserId());
+        MemberEntity member = authService.findMember(request.getUserEmail());
         LocalDateTime currentDateTime = LocalDateTime.now();
 
         Warning action = new Warning(
@@ -107,7 +108,7 @@ public class ReportService {
 
     // 유저 제재
     public void disciplineUser(DisciplinaryActionRequest request) {
-        MemberEntity member = authService.findMember(request.getUserId());
+        MemberEntity member = authService.findMember(request.getUserEmail());
         LocalDateTime currentDateTime = LocalDateTime.now();
 
         Discipline action = new Discipline(
@@ -135,14 +136,14 @@ public class ReportService {
 
     // 유저 경고 해제
     public void unassignUserWarning(RemoveActionRequest request) {
-        MemberEntity member = authService.findMember(request.getUserId());
+        MemberEntity member = authService.findMember(request.getUserEmail());
         updateActionHistory(member.getWarningHistory(), request.getReportId(), ExceptionCode.WARNING_NOT_FOUND);
         memberRepository.save(member);
     }
 
     // 유저 제재 해제
     public void unassignUserDiscipline(RemoveActionRequest request) {
-        MemberEntity member = authService.findMember(request.getUserId());
+        MemberEntity member = authService.findMember(request.getUserEmail());
         updateActionHistory(member.getDisciplinaryHistory(), request.getReportId(), ExceptionCode.DISCIPLINE_NOT_FOUND);
         member.setDisciplineDate(null);
         memberRepository.save(member);
@@ -165,15 +166,14 @@ public class ReportService {
     }
 
     // 유저 경고 내역 조회
-    public List<Warning> getUserWarningHistory(long userId) {
-        MemberEntity member = authService.findMember(userId);
+    public List<Warning> getUserWarningHistory(String userEmail) {
+        MemberEntity member = authService.findMember(userEmail);
         return member.getWarningHistory();
     }
 
-
     // 유저 제재 내역 조회
-    public List<Discipline> getUserDisciplineHistory(long userId) {
-        MemberEntity member = authService.findMember(userId);
+    public List<Discipline> getUserDisciplineHistory(String userEmail) {
+        MemberEntity member = authService.findMember(userEmail);
         return member.getDisciplinaryHistory();
     }
 }
