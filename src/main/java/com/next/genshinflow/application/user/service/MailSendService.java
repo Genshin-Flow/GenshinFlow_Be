@@ -6,6 +6,7 @@ import com.next.genshinflow.domain.user.repository.RedisRepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -18,14 +19,15 @@ import java.security.SecureRandom;
 import java.time.Duration;
 
 @Service
+@Slf4j
 @AllArgsConstructor
 public class MailSendService {
     private JavaMailSender mailSender;
     private RedisRepository redisRepository;
-    private static final long AUTH_NUM_EXPIRE_TIME = 60L;
+    private static final SecureRandom randomGenerator = new SecureRandom();
+    private static final Duration AUTH_NUM_EXPIRE_DURATION = Duration.ofSeconds(60);
 
     public String generateAuthCode() {
-        SecureRandom randomGenerator = new SecureRandom();
         StringBuilder randomNum = new StringBuilder();
 
         for (int i = 0; i < 6; i++) {
@@ -35,15 +37,13 @@ public class MailSendService {
         return randomNum.toString();
     }
 
-    public String sendVerificationEmail(String email) {
+    public void sendVerificationEmail(String email) {
         String authNum = generateAuthCode();
         String fromMail = "nextconnect.lab@gmail.com";
-        String toMail = email;
         String title = "Genshin Flow 인증코드";
         String content = loadEmailTemplate().replace("{{authNum}}", authNum);
 
-        sendEmail(fromMail, toMail, title, content, authNum);
-        return authNum;
+        sendEmail(fromMail, email, title, content, authNum);
     }
 
     private String loadEmailTemplate() {
@@ -67,23 +67,29 @@ public class MailSendService {
             helper.setText(content, true);
 
             mailSender.send(message);
+            log.info("Email sent to {}", toMail);
         }
         catch (MessagingException e) {
             throw new RuntimeException("Failed to send email", e);
         }
 
         // 인증번호는 1분동안 유효함
-        redisRepository.setData(authNum, toMail, Duration.ofSeconds(AUTH_NUM_EXPIRE_TIME));
+        redisRepository.setData(authNum, toMail, AUTH_NUM_EXPIRE_DURATION);
     }
 
     public void verifyAuthCode(String email, String authNum) {
         String storedEmail = redisRepository.getData(authNum);
 
-        if (storedEmail.equals(email)) {
-            redisRepository.deleteData(authNum);
-        }
-        else {
+        if (storedEmail == null) {
+            log.warn("Verification failed: authNum {} does not exist in Redis", authNum);
             throw new BusinessLogicException(ExceptionCode.INVALID_AUTH_CODE);
         }
+
+        if (!storedEmail.equals(email)) {
+            log.warn("Verification failed: authNum {} mismatch for provided email. Stored email is different.", authNum);
+            throw new BusinessLogicException(ExceptionCode.INVALID_AUTH_CODE);
+        }
+
+        redisRepository.deleteData(authNum);
     }
 }
