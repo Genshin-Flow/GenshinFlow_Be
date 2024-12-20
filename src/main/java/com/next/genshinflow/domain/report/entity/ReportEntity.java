@@ -9,6 +9,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 // 현재 제재 상태인 유저는 비회원으로 게시글 작성이 가능함
 // 추후에 유저의 ip를 차단하는 방식으로 변경해야함
@@ -37,8 +38,10 @@ public class ReportEntity extends BaseEntity {
     @Column(name = "content")
     private String content;
 
+    @ElementCollection
+    @CollectionTable(name = "report_images", joinColumns = @JoinColumn(name = "report_id"))
     @Column(name = "image")
-    private String image;
+    private List<String> images;
 
     @Convert(converter = ReportStatusConverter.class)
     @Column(name = "report_status")

@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
 public class CreateReportRequest {
     @Schema(description = "신고의 대상이 된 사용자 Email", type = "String", example = "moshi@gmail.com")
@@ -14,6 +16,6 @@ public class CreateReportRequest {
     @NotBlank
     private String content;
 
-    @Schema(description = "신고 이미지", type = "String")
-    private String image;
+    @Schema(description = "신고 이미지들", type = "List<String>")
+    private List<String> images;
 }
