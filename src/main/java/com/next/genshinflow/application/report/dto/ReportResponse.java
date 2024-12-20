@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Builder
@@ -27,8 +28,8 @@ public class ReportResponse {
     @Schema(description = "신고 내용", type = "String", example = "상업적/홍보성")
     private String content;
 
-    @Schema(description = "신고 이미지", type = "String")
-    private String image;
+    @Schema(description = "신고 이미지들", type = "List<String>")
+    private List<String> images;
 
     @Schema(description = "신고 처리 상태", type = "enum", example = "처리됨")
     private ReportStatus reportStatus;

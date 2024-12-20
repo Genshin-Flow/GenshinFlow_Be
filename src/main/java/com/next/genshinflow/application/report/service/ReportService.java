@@ -19,10 +19,15 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -31,6 +36,8 @@ public class ReportService {
     private final MemberRepository memberRepository;
     private final ReportRepository reportRepository;
     private final AuthService authService;
+    private static final Map<String, Role> ROLE_MAP = Arrays.stream(Role.values())
+        .collect(Collectors.toMap(Role::getRole, Function.identity()));
 
     // 신고 생성
     public void createReport(CreateReportRequest reportRequest) {
@@ -48,28 +55,32 @@ public class ReportService {
 
     // 모든 신고 내역 조회
     public Page<ReportResponse> getAllReports(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
+        Pageable pageable = createPageable(page, size);
         Page<ReportEntity> historyPage = reportRepository.findAll(pageable);
 
-        return historyPage.map(ReportMapper::reportToResponse);
+        return historyPage.map(ReportMapper::toResponse);
     }
 
     // 상태별 신고 내역 조회
     public Page<ReportResponse> getReportsByStatus(String status, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
+        Pageable pageable = createPageable(page, size);
 
         ReportStatus reportStatus = ReportStatus.fromString(status);
         Page<ReportEntity> historyPage = reportRepository.findByReportStatus(reportStatus, pageable);
 
-        return historyPage.map(ReportMapper::reportToResponse);
+        return historyPage.map(ReportMapper::toResponse);
     }
 
     // 유저 신고 내역 조회
     public Page<ReportResponse> getUserReportHistory(String userEmail, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
+        Pageable pageable = createPageable(page, size);
         Page<ReportEntity> historyPage = reportRepository.findByTargetUser_Email(userEmail, pageable);
 
-        return historyPage.map(ReportMapper::reportToResponse);
+        return historyPage.map(ReportMapper::toResponse);
+    }
+
+    private Pageable createPageable(int page, int size) {
+        return PageRequest.of(page, size, Sort.by("createdAt").ascending());
     }
 
     public ReportEntity findReport(long reportId) {
@@ -88,6 +99,7 @@ public class ReportService {
     }
 
     // 유저 경고
+    @Transactional
     public void recordUserWarning(UserWarningRequest request) {
         MemberEntity member = authService.findMember(request.getUserEmail());
         LocalDateTime currentDateTime = LocalDateTime.now();
@@ -107,6 +119,7 @@ public class ReportService {
     }
 
     // 유저 제재
+    @Transactional
     public void disciplineUser(DisciplinaryActionRequest request) {
         MemberEntity member = authService.findMember(request.getUserEmail());
         LocalDateTime currentDateTime = LocalDateTime.now();
@@ -121,10 +134,8 @@ public class ReportService {
         member.getDisciplinaryHistory().add(action);
         member.setDisciplineDate(currentDateTime);
 
-        Role status = Arrays.stream(Role.values())
-            .filter(accountStatus -> accountStatus.getRole().equals(request.getDisciplinaryAction()))
-            .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("징계 항목 없음"));
+        Role status = Optional.ofNullable(ROLE_MAP.get(request.getDisciplinaryAction()))
+            .orElseThrow(() -> new BusinessLogicException(ExceptionCode.INVALID_DISCIPLINARY_ACTION));
 
         member.setRole(status);
         memberRepository.save(member);

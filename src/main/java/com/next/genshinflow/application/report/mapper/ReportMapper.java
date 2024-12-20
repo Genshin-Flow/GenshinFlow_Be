@@ -14,13 +14,13 @@ public class ReportMapper {
         report.setReportingUser(reportingUser);
         report.setTargetUser(targetUser);
         report.setContent(reportRequest.getContent());
-        report.setImage(reportRequest.getImage());
+        report.setImages(reportRequest.getImages());
         report.setReportStatus(ReportStatus.UNPROCESSED);
 
         return report;
     }
 
-    public static ReportResponse reportToResponse(ReportEntity report) {
+    public static ReportResponse toResponse(ReportEntity report) {
         if (report == null) return null;
 
         return ReportResponse.builder()
@@ -28,7 +28,7 @@ public class ReportMapper {
             .reportingUserEmail(report.getReportingUser().getEmail())
             .targetUserEmail(report.getTargetUser().getEmail())
             .content(report.getContent())
-            .image(report.getImage())
+            .images(report.getImages())
             .reportStatus(report.getReportStatus())
             .createdAt(report.getCreatedAt())
             .completedAt(report.getCompletedAt() != null ? report.getCompletedAt() : null)
