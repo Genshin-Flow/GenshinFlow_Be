@@ -2,6 +2,7 @@ package com.next.genshinflow.application.post.controller;
 
 import java.util.List;
 
+import com.next.genshinflow.application.BasePageResponse;
 import com.next.genshinflow.application.post.dto.GuestPostActionRequest;
 import com.next.genshinflow.application.post.dto.PostModifyRequest;
 import com.next.genshinflow.application.post.dto.PostResponse;
@@ -43,12 +44,12 @@ public class PostController {
 
     @Operation(summary = "포스팅 목록", description = "size = 20")
     @GetMapping
-    public ResponseEntity<List<PostResponse>> getPosts(
+    public ResponseEntity<BasePageResponse<PostResponse>> getPosts(
         @Positive @RequestParam(value = "page", defaultValue = "1") int page,
         @Positive @RequestParam(value = "size", defaultValue = "20") int size
     ) {
-        Page<PostResponse> postPage = postService.getPosts(page-1, size);
-        return ResponseEntity.ok(postPage.getContent());
+        BasePageResponse<PostResponse> pageResponse = postService.getPosts(page-1, size);
+        return ResponseEntity.ok(pageResponse);
     }
 
     @Operation(summary = "회원 게시물 완료 처리")

@@ -25,6 +25,8 @@ public enum ExceptionCode {
     WARNING_NOT_FOUND(404, "해당 reportId는 경고 내역에 없습니다."),
     DISCIPLINE_NOT_FOUND(404, "해당 reportId는 제재 내역에 없습니다."),
     INVALID_DISCIPLINARY_ACTION(400, "유효하지 않은 징계 사항입니다."),
+    UID_REQUIRED_FOR_GUEST(400, "비회원은 uid를 입력해야 합니다."),
+    PASSWORD_REQUIRED_FOR_GUEST(400, "비회원은 password를 입력해야 합니다."),
     POST_NOT_FOUND(404, "게시물을 찾을 수 없습니다."),
     INVALID_POST_PASSWORD(400, "잘못된 게시글 비밀번호입니다.");
 
