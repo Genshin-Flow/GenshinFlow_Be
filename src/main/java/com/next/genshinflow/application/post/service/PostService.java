@@ -1,5 +1,6 @@
 package com.next.genshinflow.application.post.service;
 
+import com.next.genshinflow.application.BasePageResponse;
 import com.next.genshinflow.application.post.dto.GuestPostActionRequest;
 import com.next.genshinflow.application.post.dto.PostModifyRequest;
 import com.next.genshinflow.application.post.dto.PostResponse;
@@ -35,35 +36,43 @@ public class PostService {
     }
 
     public PostResponse createGuestPost(PostCreateRequest request) {
+        if (request.getUid() <= 0) {
+            throw new BusinessLogicException(ExceptionCode.UID_REQUIRED_FOR_GUEST);
+        }
+
+        if (request.getPassword() == null) {
+            throw new BusinessLogicException(ExceptionCode.PASSWORD_REQUIRED_FOR_GUEST);
+        }
+
         return savePost(request, null);
     }
 
     private PostResponse savePost(PostCreateRequest request, MemberEntity member) {
         LocalDateTime completedAt = LocalDateTime.now().plusMinutes(request.getAutoCompleteTime());
 
-        PostEntity post = (member != null)
-            ? PostMapper.toPost(request, member, completedAt)
-            : PostMapper.toGuestPost(request, completedAt);
+        PostEntity post = PostMapper.toPost(request, member, completedAt);
 
         PostEntity savedPost = postRepository.save(post);
         return PostMapper.toResponse(savedPost);
     }
 
     // 게시물 전체 조회
-    public Page<PostResponse> getPosts(int page, int size) {
+    public BasePageResponse<PostResponse> getPosts(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("sortedAt").descending());
         Page<PostEntity> postPage = postRepository.findAll(pageable);
 
         // 게시물 자동 완료 처리
         autoCompletedPost(pageable);
 
-        final Long member = (authService.getCurrentMember() != null) ? authService.getCurrentMember().getId() : null;
+        Page<PostResponse> postResponsePage = postPage.map(PostMapper::toResponse);
 
-        if (member == null) {
-            return postPage.map(PostMapper::toResponse);
-        }
-
-        return postPage.map(post -> PostMapper.toListResponse(post, member));
+        return new BasePageResponse<>(
+            postResponsePage.getContent(),
+            postResponsePage.getNumber() + 1,
+            postResponsePage.getSize(),
+            postResponsePage.getTotalElements(),
+            postResponsePage.getTotalPages()
+        );
     }
 
     // 게시물 완료 처리
