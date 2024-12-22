@@ -44,6 +44,7 @@ dependencies {
     // db
     implementation 'io.hypersistence:hypersistence-utils-hibernate-60:3.4.1'
     runtimeOnly 'com.h2database:h2'
+    implementation 'mysql:mysql-connector-java:8.0.29'
 
     // Swagger - springdoc
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springdocSwagger}"

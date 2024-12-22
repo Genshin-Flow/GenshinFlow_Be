@@ -1,0 +1,36 @@
+spring:
+  config:
+    activate:
+      on-profile: server
+  datasource:
+    url: jdbc:mysql://genshin-flow-db.c9ewi44cswiz.ap-northeast-2.rds.amazonaws.com:3306/genshin_flow_db?&serverTimezone=Asia/Seoul
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
+
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+
+  mail:
+    host: smtp.gmail.com
+    username: nextconnect.lab@gmail.com
+    password: ${MAIL_PW}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+
+  redis:
+    host: localhost
+    port: 6379
+
+jwt:
+  header: Authorization
+  secret: ${JWT_SECRET_KEY}
+  token-validity-in-seconds: 1800
+  refresh-token-validity-in-seconds: 604800
+
+enka:
+  host: https://enka.network
