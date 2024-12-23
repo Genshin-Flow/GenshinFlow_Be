@@ -1,18 +1,20 @@
 spring:
-  config:
-    activate:
-      on-profile: server
   datasource:
-    jdbc-url: jdbc:mysql://genshin-flow-db.c9ewi44cswiz.ap-northeast-2.rds.amazonaws.com:3306/genshin_flow_db?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
     driver-class-name: com.mysql.cj.jdbc.Driver
+    jdbc-url: jdbc:mysql://genshin-flow-db.c9ewi44cswiz.ap-northeast-2.rds.amazonaws.com:3306/genshin_flow_db?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: ${MYSQL_USERNAME}
     password: ${MYSQL_PASSWORD}
-
+    hikari:
+      connection-timeout: 30000
+      validation-timeout: 5000
   jpa:
-    database-platform: org.hibernate.dialect.MySQL8Dialect
-    hibernate:
-      ddl-auto: update
-    show-sql: false
+    database-platform: org.hibernate.dialect.MySQLDialect
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        show-sql: false
+        hbm2ddl:
+          auto: create
 
   mail:
     host: smtp.gmail.com

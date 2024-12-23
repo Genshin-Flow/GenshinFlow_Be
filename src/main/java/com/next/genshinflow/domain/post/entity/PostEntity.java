@@ -23,7 +23,7 @@ import org.hibernate.annotations.Comment;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "post")
+@Table(name = "posting")
 @Comment("메인 대시보드 post")
 public class PostEntity extends BaseEntity {
 
