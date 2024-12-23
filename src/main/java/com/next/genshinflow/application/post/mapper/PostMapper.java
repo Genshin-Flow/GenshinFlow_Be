@@ -44,11 +44,19 @@ public class PostMapper {
 
     public static PostResponse toResponse(PostEntity post) {
         if (post == null) return null;
-        String writerEmail = (post.getWriter() != null) ? post.getWriter().getEmail() : null;
+
+        String writerEmail = null;
+        String writerName = "Guest";
+
+        if (post.getWriter() != null) {
+            writerEmail = post.getWriter().getEmail();
+            writerName = post.getWriter().getName();
+        }
 
         return PostResponse.builder()
             .id(post.getId())
             .writerEmail(writerEmail)
+            .writerName(writerName)
             .title(post.getTitle())
             .uid(post.getUid())
             .region(post.getRegion())
