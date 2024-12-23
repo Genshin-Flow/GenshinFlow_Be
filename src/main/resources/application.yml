@@ -1,29 +1,20 @@
 spring:
-  config:
-    activate:
-      on-profile: local
   datasource:
-    driver-class-name: org.h2.Driver
-    jdbc-url: jdbc:h2:mem:test
-    username: sa
-    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    jdbc-url: jdbc:mysql://genshin-flow-db.c9ewi44cswiz.ap-northeast-2.rds.amazonaws.com:3306/genshin_flow_db?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
     hikari:
       connection-timeout: 30000
       validation-timeout: 5000
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.MySQLDialect
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.H2Dialect
-        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+        show-sql: false
         hbm2ddl:
           auto: create
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
-      settings:
-        web-allow-others: true
 
   mail:
     host: smtp.gmail.com
