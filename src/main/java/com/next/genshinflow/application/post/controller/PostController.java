@@ -55,16 +55,16 @@ public class PostController {
     @Operation(summary = "회원 게시물 완료 처리")
     @PatchMapping("/user/{postId}/complete")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    public ResponseEntity<PostResponse> completeUserPost(@PathVariable("postId") @NotNull long postId) {
-        PostResponse postResponse = postService.completeUserPost(postId);
-        return ResponseEntity.ok(postResponse);
+    public ResponseEntity<Void> completeUserPost(@PathVariable("postId") @NotNull long postId) {
+        postService.completeUserPost(postId);
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "비회원 게시물 완료 처리")
     @PatchMapping("/guest/complete")
-    public ResponseEntity<PostResponse> completeGuestPost(@Valid @RequestBody GuestPostActionRequest request) {
-        PostResponse postResponse = postService.completeGuestPost(request);
-        return ResponseEntity.ok(postResponse);
+    public ResponseEntity<Void> completeGuestPost(@Valid @RequestBody GuestPostActionRequest request) {
+        postService.completeGuestPost(request);
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "회원 게시물 수정")
@@ -85,16 +85,16 @@ public class PostController {
     @Operation(summary = "회원 리퀘스트 끌어올리기")
     @PatchMapping("/user/{postId}/pull-up")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    public ResponseEntity<PostResponse> pullUpUserPost(@PathVariable("postId") @NotNull long postId) {
-        PostResponse postResponse = postService.pullUpUserPost(postId);
-        return ResponseEntity.ok(postResponse);
+    public ResponseEntity<Void> pullUpUserPost(@PathVariable("postId") @NotNull long postId) {
+        postService.pullUpUserPost(postId);
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "비회원 리퀘스트 끌어올리기")
     @PatchMapping("/guest/pull-up")
-    public ResponseEntity<PostResponse> pullUpGuestPost(@Valid @RequestBody GuestPostActionRequest request) {
-        PostResponse postResponse = postService.pullUpGuestPost(request);
-        return ResponseEntity.ok(postResponse);
+    public ResponseEntity<Void> pullUpGuestPost(@Valid @RequestBody GuestPostActionRequest request) {
+        postService.pullUpGuestPost(request);
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "회원 게시물 삭제")
