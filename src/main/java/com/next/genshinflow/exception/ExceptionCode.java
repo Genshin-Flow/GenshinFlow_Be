@@ -8,6 +8,8 @@ import lombok.Getter;
 public enum ExceptionCode {
     MEMBER_NOT_FOUND(404, "회원을 찾을 수 없습니다."),
     MEMBER_EXISTS(409, "회원이 존재합니다."),
+    INVALID_CREDENTIALS(400, "아이디 또는 비밀번호가 잘못되었습니다."),
+    LOGIN_ATTEMPTS_EXCEEDED(423, "로그인 시도 횟수를 초과했습니다. 비밀번호를 변경해주세요."),
     NO_PERMISSION(403, "권한이 없습니다."),
     UNAUTHORIZED_USER(401, "인증되지 않은 사용자입니다."),
     JWT_TOKEN_EXPIRED(404, "만료된 JWT 토큰입니다."),
