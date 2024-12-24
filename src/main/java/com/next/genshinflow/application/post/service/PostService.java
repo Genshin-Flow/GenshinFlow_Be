@@ -76,18 +76,18 @@ public class PostService {
     }
 
     // 게시물 완료 처리
-    public PostResponse completeUserPost(long postId) {
-        return completePost(validatePost(postId, null));
+    public void completeUserPost(long postId) {
+        completePost(validatePost(postId, null));
     }
 
     // 비회원 게시물 완료 처리
-    public PostResponse completeGuestPost(GuestPostActionRequest request) {
-        return completePost(validatePost(request.getPostId(), request.getPassword()));
+    public void completeGuestPost(GuestPostActionRequest request) {
+        completePost(validatePost(request.getPostId(), request.getPassword()));
     }
 
-    private PostResponse completePost(PostEntity post) {
+    private void completePost(PostEntity post) {
         post.setCompleted(true);
-        return PostMapper.toResponse(postRepository.save(post));
+        postRepository.save(post);
     }
 
     // 게시물 자동 완료 처리
@@ -127,19 +127,18 @@ public class PostService {
     }
 
     // 끌올
-    public PostResponse pullUpUserPost(long postId) {
-        return pullUpPost(validatePost(postId, null));
+    public void pullUpUserPost(long postId) {
+        pullUpPost(validatePost(postId, null));
     }
 
     // 비회원 끌올
-    public PostResponse pullUpGuestPost(GuestPostActionRequest request) {
-        return pullUpPost(validatePost(request.getPostId(), request.getPassword()));
+    public void pullUpGuestPost(GuestPostActionRequest request) {
+        pullUpPost(validatePost(request.getPostId(), request.getPassword()));
     }
 
-    private PostResponse pullUpPost(PostEntity post) {
+    private void pullUpPost(PostEntity post) {
         post.setSortedAt(LocalDateTime.now());
         postRepository.save(post);
-        return PostMapper.toResponse(post);
     }
 
     public void deleteUserPost(long postId) {

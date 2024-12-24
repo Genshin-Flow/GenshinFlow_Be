@@ -40,7 +40,7 @@ public class ReportService {
         .collect(Collectors.toMap(Role::getRole, Function.identity()));
 
     // 신고 생성
-    public void createReport(CreateReportRequest reportRequest) {
+    public ReportResponse createReport(CreateReportRequest reportRequest) {
         MemberEntity member = authService.getCurrentMember();
 
         if (member.getEmail().equals(reportRequest.getTargetUserEmail())) {
@@ -50,7 +50,8 @@ public class ReportService {
         MemberEntity targetUser = authService.findMember(reportRequest.getTargetUserEmail());
 
         ReportEntity report = ReportMapper.toReport(reportRequest, member, targetUser);
-        reportRepository.save(report);
+        ReportEntity createReport = reportRepository.save(report);
+        return ReportMapper.toResponse(createReport);
     }
 
     // 모든 신고 내역 조회
