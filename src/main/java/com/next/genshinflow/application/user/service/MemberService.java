@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MemberService {
     private final AuthService authService;
+    private final EnkaService enkaService;
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
 
@@ -52,8 +53,7 @@ public class MemberService {
         findMember.setUid(request.getUid());
         MemberEntity updatedMember = memberRepository.save(findMember);
 
-        UserInfoResponse apiResponse = authService.getUserInfoFromApi(request.getUid());
-        authService.updateMemberIfPlayerInfoChanged(updatedMember, apiResponse);
+        enkaService.updateMemberIfPlayerInfoChanged(updatedMember);
 
         return MemberMapper.memberToResponse(updatedMember);
     }

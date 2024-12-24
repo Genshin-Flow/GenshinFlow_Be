@@ -4,6 +4,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.next.genshinflow.application.user.dto.enkaApi.ProfileImgDataResponse;
 import com.next.genshinflow.application.user.dto.enkaApi.UserInfoResponse;
+import com.next.genshinflow.domain.user.entity.MemberEntity;
+import com.next.genshinflow.domain.user.repository.MemberRepository;
+import com.next.genshinflow.exception.BusinessLogicException;
+import com.next.genshinflow.exception.ExceptionCode;
 import com.next.genshinflow.infrastructure.EnkaClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,8 +24,19 @@ import java.util.List;
 public class EnkaService {
     private final EnkaClient enkaClient;
     private final ObjectMapper objectMapper;
+    private final MemberRepository memberRepository;
 
-    public UserInfoResponse fetchUserInfoFromApi(long uid) {
+    // 원신 api 유저 정보 요청
+    public UserInfoResponse getUserInfoFromApi(long uid) {
+        UserInfoResponse apiResponse = fetchUserInfoFromApi(uid);
+
+        if (apiResponse.getPlayerInfo() == null) {
+            throw new BusinessLogicException(ExceptionCode.EXTERNAL_API_ERROR);
+        }
+        return apiResponse;
+    }
+
+    private UserInfoResponse fetchUserInfoFromApi(long uid) {
         try {
             ResponseEntity<UserInfoResponse> responseEntity =
                 enkaClient.getUserInfo(uid, 1L);
@@ -60,6 +75,36 @@ public class EnkaService {
         catch (IOException e) {
             log.error("IOException occurred while reading profile pictures: {}", e.getMessage(), e);
             throw new RuntimeException("프로필 사진을 불러오는데 실패했습니다.", e);
+        }
+    }
+
+    // 받아온 api를 조회해 변경된 유저 정보가 있으면 업데이트
+    public void updateMemberIfPlayerInfoChanged(MemberEntity member) {
+        UserInfoResponse.PlayerInfo playerInfo = getUserInfoFromApi(member.getUid()).getPlayerInfo();
+        if (playerInfo == null) return;
+        boolean isUpdated = false;
+
+        if (!member.getName().equals(playerInfo.getNickname())) {
+            member.setName(playerInfo.getNickname());
+            isUpdated = true;
+        }
+        if (member.getLevel() != playerInfo.getLevel()) {
+            member.setLevel(playerInfo.getLevel());
+            isUpdated = true;
+        }
+        if (member.getWorldLevel() != playerInfo.getWorldLevel()) {
+            member.setWorldLevel(playerInfo.getWorldLevel());
+            isUpdated = true;
+        }
+
+        String tower = playerInfo.getTowerFloorIndex() + "-" + playerInfo.getTowerLevelIndex();
+        if (!member.getTowerLevel().equals(tower)) {
+            member.setTowerLevel(tower);
+            isUpdated = true;
+        }
+
+        if (isUpdated) {
+            memberRepository.save(member);
         }
     }
 }
