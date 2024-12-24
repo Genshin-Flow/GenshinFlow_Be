@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -25,9 +26,9 @@ public class ReportController {
     @Operation(summary = "유저 신고")
     @PostMapping("/user/report")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    public ResponseEntity<Void> createReport(@Valid @RequestBody CreateReportRequest reportRequest) {
-        reportService.createReport(reportRequest);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<ReportResponse> createReport(@Valid @RequestBody CreateReportRequest reportRequest) {
+        ReportResponse reportResponse = reportService.createReport(reportRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(reportResponse);
     }
 
     @Operation(summary = "신고 내역 전체 조회", description = "size = 15")
