@@ -58,6 +58,9 @@ public class MemberEntity extends BaseEntity {
     @Column(name = "oauth_user")
     private Boolean oAuthUser;
 
+    @Column(name = "failed_login_attempts")
+    private int failedLoginAttempts;
+
     @Column(name = "discipline_date")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime disciplineDate;
