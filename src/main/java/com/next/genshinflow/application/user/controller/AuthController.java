@@ -41,7 +41,7 @@ public class AuthController {
         MemberResponse createdMember = authService.createMember(request);
         URI location = UriCreator.createUri("/member", createdMember.getId());
 
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.created(location).body(createdMember);
     }
 
     @Operation(summary = "로그인", description = "이메일과 비밀번호로 로그인 처리")
@@ -102,7 +102,6 @@ public class AuthController {
 
     @Operation(summary = "비밀번호 변경", description = "이메일 인증(/verification-code/send) 후 유저의 비밀번호 변경")
     @PatchMapping("/change-password")
-    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<Void> changePassword(@RequestBody ChangePasswordRequest request) {
 
         authService.changePassword(request.getEmail(), request.getAuthNum(), request.getPassword());
