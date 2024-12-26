@@ -44,25 +44,24 @@ public class AuthService {
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
-    // 일반 유저 회원가입
-    public MemberResponse createMember(SignUpRequest signUpRequest) {
-        mailSendService.verifyAuthCode(signUpRequest.getEmail(), signUpRequest.getAuthNum());
-        return saveNewMember(signUpRequest.getUid(), signUpRequest.getEmail(), signUpRequest.getPassword(), false);
-    }
+    //  회원가입
+    public MemberResponse createUser(SignUpRequest signUpRequest, boolean oauth) {
+        // email, uid 검증
+        validateEmail(signUpRequest.getEmail());
+        validateUid(signUpRequest.getUid());
 
-    // OAuth 회원가입
-    public MemberResponse createOAuthMember(OAuthSignUpRequest signUpRequest) {
-        return saveNewMember(signUpRequest.getUid(), signUpRequest.getEmail(), null, true);
-    }
+        if (!oauth) {
+            validateAuthNum(signUpRequest.getAuthNum());
+            validatePassword(signUpRequest.getPassword());
+            mailSendService.verifyAuthCode(signUpRequest.getEmail(), signUpRequest.getAuthNum());
+        }
 
-    private MemberResponse saveNewMember(long uid, String email, String password, boolean oauth) {
-        verifyExistEmail(email);
-
-        UserInfoResponse apiResponse = enkaService.getUserInfoFromApi(uid);
-        MemberEntity member = buildMemberEntity(uid, email, password, apiResponse, oauth);
+        UserInfoResponse apiResponse = enkaService.getUserInfoFromApi(signUpRequest.getUid());
+        MemberEntity member = buildMemberEntity(signUpRequest.getUid(), signUpRequest.getEmail(), signUpRequest.getPassword(), apiResponse, oauth);
         MemberEntity savedMember = memberRepository.save(member);
 
-        log.info("User {} successfully signed up.", email);
+        log.info("User {} successfully signed up. [OAuth: {}]", signUpRequest.getEmail(), oauth);
+        redisRepository.deleteData(signUpRequest.getAuthNum());
         return MemberMapper.memberToResponse(savedMember);
     }
 
@@ -204,11 +203,31 @@ public class AuthService {
         }
     }
 
-    // 이메일 검증
-    public void verifyExistEmail(String email) {
+    private void validateEmail(String email) {
+        if (email == null || email.isBlank())
+            throw new BusinessLogicException(ExceptionCode.EMAIL_REQUIRED);
+
         Optional<MemberEntity> member = memberRepository.findByEmail(email);
         if (member.isPresent())
             throw new BusinessLogicException(ExceptionCode.MEMBER_EXISTS);
+    }
+
+    private void validateAuthNum(String AuthNum) {
+        if (AuthNum == null || AuthNum.isBlank())
+            throw new BusinessLogicException(ExceptionCode.UID_REQUIRED);
+    }
+
+    private void validateUid(long uid) {
+        if (uid <= 0)
+            throw new BusinessLogicException(ExceptionCode.UID_REQUIRED);
+
+        if (memberRepository.existsByUid(uid))
+            throw new BusinessLogicException(ExceptionCode.UID_ALREADY_EXISTS);
+    }
+
+    private void validatePassword(String Password) {
+        if (Password== null || Password.isBlank())
+            throw new BusinessLogicException(ExceptionCode.PASSWORD_REQUIRED);
     }
 
     public MemberEntity findMember(String email) {
