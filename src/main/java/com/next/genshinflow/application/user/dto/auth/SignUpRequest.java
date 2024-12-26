@@ -19,12 +19,10 @@ public class SignUpRequest {
     @NotBlank
     private String email;
 
-    @Schema(description = "이메일 인증 번호", type = "String", example = "199494")
-    @NotEmpty(message = "인증 번호를 입력해 주세요")
+    @Schema(description = "이메일 인증 번호 (일반 유저만)", type = "String", example = "199494")
     private String authNum;
 
-    @Schema(description = "사용자 비밀번호", type = "String", example = "example1234!")
-    @NotBlank
+    @Schema(description = "사용자 비밀번호 (일반 유저만)", type = "String", example = "example1234!")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Pattern(
         regexp = "^(?=.*[A-Za-z])(?=.*[0-9])|(?=.*[A-Za-z])(?=.*[!@#$%^&*(),.?\":{}|<>])|(?=.*[0-9])(?=.*[!@#$%^&*(),.?\":{}|<>]).{8,}$",

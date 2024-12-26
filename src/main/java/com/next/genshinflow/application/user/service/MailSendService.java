@@ -89,7 +89,5 @@ public class MailSendService {
             log.warn("Verification failed: authNum {} mismatch for provided email. Stored email is different.", authNum);
             throw new BusinessLogicException(ExceptionCode.INVALID_AUTH_CODE);
         }
-
-        redisRepository.deleteData(authNum);
     }
 }

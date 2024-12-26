@@ -38,29 +38,18 @@ public class AuthController {
     @Operation(summary = "회원가입", description = "이메일과 비밀번호로 회원 가입 처리")
     @PostMapping("/sign-up")
     public ResponseEntity<MemberResponse> signUpMember(@Valid @RequestBody SignUpRequest request) {
-        MemberResponse createdMember = authService.createMember(request);
+        MemberResponse createdMember = authService.createUser(request, false);
         URI location = UriCreator.createUri("/member", createdMember.getId());
 
         return ResponseEntity.created(location).body(createdMember);
     }
 
-    @Operation(summary = "로그인", description = "이메일과 비밀번호로 로그인 처리")
-    @PostMapping("/sign-in")
-    public ResponseEntity<TokenResponse> signInMember(@Valid @RequestBody LoginRequest loginRequest) {
-        TokenResponse tokenResponse = authService.authenticate(loginRequest);
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + tokenResponse.getAccessToken());
-
-        return new ResponseEntity<>(tokenResponse, httpHeaders, HttpStatus.OK);
-    }
-
     @Operation(summary = "OAuth 회원가입", description = "이메일로 회원가입 처리")
     @PostMapping("/sign-up/{provider}")
-    public ResponseEntity<TokenResponse> signUpOAuth(@Valid @RequestBody OAuthSignUpRequest request,
+    public ResponseEntity<TokenResponse> signUpOAuth(@Valid @RequestBody SignUpRequest request,
                                                      @PathVariable("provider") @NotBlank String provider) {
-
         // 회원가입 처리
-        MemberResponse createdMember = authService.createOAuthMember(request);
+        MemberResponse createdMember = authService.createUser(request, true);
 
         // 로그인 처리
         OAuthSignInRequest loginRequest = OAuthSignInRequest.builder()
@@ -72,6 +61,16 @@ public class AuthController {
         httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + tokenResponse.getAccessToken());
 
         return new ResponseEntity<>(tokenResponse, httpHeaders, HttpStatus.CREATED);
+    }
+
+    @Operation(summary = "로그인", description = "이메일과 비밀번호로 로그인 처리")
+    @PostMapping("/sign-in")
+    public ResponseEntity<TokenResponse> signInMember(@Valid @RequestBody LoginRequest loginRequest) {
+        TokenResponse tokenResponse = authService.authenticate(loginRequest);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + tokenResponse.getAccessToken());
+
+        return new ResponseEntity<>(tokenResponse, httpHeaders, HttpStatus.OK);
     }
 
     @Operation(summary = "OAuth 로그인", description = "이메일로 로그인 처리")
