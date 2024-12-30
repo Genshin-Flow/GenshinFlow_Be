@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  S3_BUCKET_NAME: genshin-flow-bucket
+  S3_BUCKET_NAME: genshin-flow-s3bucket
 
 jobs:
   deploy:
