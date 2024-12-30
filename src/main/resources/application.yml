@@ -1,7 +1,7 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    jdbc-url: jdbc:mysql://genshin-flow-db.c9ewi44cswiz.ap-northeast-2.rds.amazonaws.com:3306/genshin_flow_db?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    jdbc-url: jdbc:mysql://genshin-flow-rds.cxu6mgyqiakc.ap-northeast-2.rds.amazonaws.com:3306/genshin_flow_db?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: ${MYSQL_USERNAME}
     password: ${MYSQL_PASSWORD}
     hikari:
