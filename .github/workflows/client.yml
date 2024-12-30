@@ -65,8 +65,8 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           aws deploy create-deployment \
-            --application-name genshinflow-codeDeploy \
-            --deployment-group-name genshin-flow-group \
+            --application-name genshin-flow-codedeploy \
+            --deployment-group-name genshin-flow-codedeploy-group \
             --file-exists-behavior OVERWRITE \
-            --s3-location bucket=genshin-flow-bucket,bundleType=zip,key=genshin-flow.zip \
+            --s3-location bucket=genshin-flow-s3bucket,bundleType=zip,key=genshin-flow.zip \
             --region ap-northeast-2
