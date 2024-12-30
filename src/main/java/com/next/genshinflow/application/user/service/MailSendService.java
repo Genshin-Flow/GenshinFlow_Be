@@ -1,7 +1,5 @@
 package com.next.genshinflow.application.user.service;
 
-import com.next.genshinflow.exception.BusinessLogicException;
-import com.next.genshinflow.exception.ExceptionCode;
 import com.next.genshinflow.domain.user.repository.RedisRepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -75,19 +73,5 @@ public class MailSendService {
 
         // 인증번호는 1분동안 유효함
         redisRepository.setData(authNum, toMail, AUTH_NUM_EXPIRE_DURATION);
-    }
-
-    public void verifyAuthCode(String email, String authNum) {
-        String storedEmail = redisRepository.getData(authNum);
-
-        if (storedEmail == null) {
-            log.warn("Verification failed: authNum {} does not exist in Redis", authNum);
-            throw new BusinessLogicException(ExceptionCode.INVALID_AUTH_CODE);
-        }
-
-        if (!storedEmail.equals(email)) {
-            log.warn("Verification failed: authNum {} mismatch for provided email. Stored email is different.", authNum);
-            throw new BusinessLogicException(ExceptionCode.INVALID_AUTH_CODE);
-        }
     }
 }
