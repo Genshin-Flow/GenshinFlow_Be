@@ -6,6 +6,7 @@ import com.next.genshinflow.application.user.dto.member.MemberResponse;
 import com.next.genshinflow.application.user.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -43,7 +44,7 @@ public class MemberController {
     @Operation(summary = "UID 변경")
     @PatchMapping("/update/uid")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    public ResponseEntity<MemberResponse> updateUid(@RequestBody ChangeUidRequest request) {
+    public ResponseEntity<MemberResponse> updateUid(@Valid @RequestBody ChangeUidRequest request) {
 
         MemberResponse updatedMemberResponse = memberService.updateUid(request);
         return ResponseEntity.ok(updatedMemberResponse);

@@ -6,6 +6,8 @@ import com.next.genshinflow.application.user.dto.member.MemberResponse;
 import com.next.genshinflow.application.user.service.AuthService;
 import com.next.genshinflow.application.user.service.MailSendService;
 import com.next.genshinflow.domain.utils.UriCreator;
+import com.next.genshinflow.exception.BusinessLogicException;
+import com.next.genshinflow.exception.ExceptionCode;
 import com.next.genshinflow.security.jwt.JwtFilter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -38,7 +40,7 @@ public class AuthController {
     @Operation(summary = "회원가입", description = "이메일과 비밀번호로 회원 가입 처리")
     @PostMapping("/sign-up")
     public ResponseEntity<MemberResponse> signUpMember(@Valid @RequestBody SignUpRequest request) {
-        MemberResponse createdMember = authService.createUser(request, false);
+        MemberResponse createdMember = authService.createUser(request);
         URI location = UriCreator.createUri("/member", createdMember.getId());
 
         return ResponseEntity.created(location).body(createdMember);
@@ -46,10 +48,10 @@ public class AuthController {
 
     @Operation(summary = "OAuth 회원가입", description = "이메일로 회원가입 처리")
     @PostMapping("/sign-up/{provider}")
-    public ResponseEntity<TokenResponse> signUpOAuth(@Valid @RequestBody SignUpRequest request,
+    public ResponseEntity<TokenResponse> signUpOAuth(@Validated @RequestBody OAuthSignUpRequest request,
                                                      @PathVariable("provider") @NotBlank String provider) {
         // 회원가입 처리
-        MemberResponse createdMember = authService.createUser(request, true);
+        MemberResponse createdMember = authService.createOAuthUser(request);
 
         // 로그인 처리
         OAuthSignInRequest loginRequest = OAuthSignInRequest.builder()
@@ -75,7 +77,7 @@ public class AuthController {
 
     @Operation(summary = "OAuth 로그인", description = "이메일로 로그인 처리")
     @PostMapping("/sign-in/{provider}")
-    public ResponseEntity<TokenResponse> signInOAuth(@Valid @RequestBody OAuthSignInRequest loginRequest,
+    public ResponseEntity<TokenResponse> signInOAuth(@Validated @RequestBody OAuthSignInRequest loginRequest,
                                                      @PathVariable("provider") @NotBlank String provider) {
 
         TokenResponse tokenResponse = authService.authenticateWithOAuth(loginRequest, provider);
@@ -90,20 +92,27 @@ public class AuthController {
         description = "리프레시 토큰을 이용해 만료된 액세스 토큰을 갱신함."
     )
     @PostMapping("/refresh")
-    public ResponseEntity<TokenResponse> refreshAccessToken(@RequestHeader("AccessToken") String accessTokenHeader,
-                                                            @RequestHeader("RefreshToken") String refreshTokenHeader) {
-        String accessToken = accessTokenHeader.replace("Bearer ", "");
-        String refreshToken = refreshTokenHeader.replace("Bearer ", "");
-        TokenResponse tokenResponse = authService.refreshAccessToken(accessToken, refreshToken);
+    public ResponseEntity<TokenResponse> refreshAccessToken(@RequestHeader(value = "AccessToken", required = false) String accessTokenHeader,
+                                                            @RequestHeader(value = "RefreshToken", required = false) String refreshTokenHeader) {
 
+        if (accessTokenHeader == null || accessTokenHeader.isBlank())
+            throw new BusinessLogicException(ExceptionCode.ACCESS_TOKEN_REQUIRED);
+
+        if (refreshTokenHeader == null || refreshTokenHeader.isBlank())
+            throw new BusinessLogicException(ExceptionCode.REFRESH_TOKEN_REQUIRED);
+
+        TokenResponse tokenResponse = authService.refreshAccessToken(
+            accessTokenHeader.replace("Bearer ", ""),
+            refreshTokenHeader.replace("Bearer ", "")
+        );
         return ResponseEntity.ok(tokenResponse);
     }
 
     @Operation(summary = "비밀번호 변경", description = "이메일 인증(/verification-code/send) 후 유저의 비밀번호 변경")
     @PatchMapping("/change-password")
-    public ResponseEntity<Void> changePassword(@RequestBody ChangePasswordRequest request) {
+    public ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
 
-        authService.changePassword(request.getEmail(), request.getAuthNum(), request.getPassword());
+        authService.changePassword(request);
         return ResponseEntity.ok().build();
     }
 }
