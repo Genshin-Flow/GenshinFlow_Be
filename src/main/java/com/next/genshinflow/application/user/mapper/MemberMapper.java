@@ -1,6 +1,6 @@
 package com.next.genshinflow.application.user.mapper;
 
-import com.next.genshinflow.application.user.dto.enkaApi.UserInfoResponse;
+import com.next.genshinflow.infrastructure.enkaApi.UserInfoResponse;
 import com.next.genshinflow.application.user.dto.member.MemberResponse;
 import com.next.genshinflow.domain.user.entity.MemberEntity;
 import com.next.genshinflow.enumeration.Role;

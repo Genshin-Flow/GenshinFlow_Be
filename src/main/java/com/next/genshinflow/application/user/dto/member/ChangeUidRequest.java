@@ -14,7 +14,7 @@ public class ChangeUidRequest {
     @Schema(description = "유저 Email", type = "String", example = "moshi@gmail.com")
     @Email
     @NotBlank(message = "이메일을 입력해 주세요.")
-    private String userEmail;
+    private String email;
 
     @Schema(description = "원신 UID", type = "long", example = "1800812993")
     @Positive(message = "UID를 입력해 주세요.")
