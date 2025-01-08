@@ -1,4 +1,4 @@
-package com.next.genshinflow.application.user.dto.auth;
+package com.next.genshinflow.application.user.dto.member;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;

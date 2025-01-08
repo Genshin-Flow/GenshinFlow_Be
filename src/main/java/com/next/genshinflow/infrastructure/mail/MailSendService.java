@@ -1,4 +1,4 @@
-package com.next.genshinflow.application.user.service;
+package com.next.genshinflow.infrastructure.mail;
 
 import com.next.genshinflow.domain.user.repository.RedisRepository;
 import jakarta.mail.MessagingException;
