@@ -49,10 +49,9 @@ public class SignInService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // 공통 후처리 작업
-        processPostLoginTasks(member, authentication);
-
+        String refreshToken = processPostLoginTasks(member, authentication);
         String accessToken = tokenProvider.generateAccessToken(authentication);
-        return new TokenResponse(accessToken, redisRepository.getData(member.getEmail()));
+        return new TokenResponse(accessToken, refreshToken);
     }
 
     // OAuth 로그인
@@ -69,23 +68,23 @@ public class SignInService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // 공통 후처리 작업
-        processPostLoginTasks(member, authentication);
-
+        String refreshToken = processPostLoginTasks(member, authentication);
         String accessToken = tokenProvider.generateAccessToken(authentication);
-        return new TokenResponse(accessToken, redisRepository.getData(member.getEmail()));
+        return new TokenResponse(accessToken, refreshToken);
     }
 
-    private void processPostLoginTasks(MemberEntity member, Authentication authentication) {
+    private String processPostLoginTasks(MemberEntity member, Authentication authentication) {
         // 게임 상의 프로필 정보 변경 시 업데이트
         userProfileService.updateMemberIfPlayerInfoChanged(member);
         // 제재 유저일 시 제재 기간 확인 및 복구
         checkAndUpdateDisciplinaryStatus(member.getId());
         // 로그인 성공 시 Redis에 RefreshToken 저장
         String refreshToken = tokenProvider.generateRefreshToken(authentication);
-        redisRepository.setData(member.getEmail(), refreshToken, Duration.ofDays(7));
+        redisRepository.setData(refreshToken, member.getEmail(), Duration.ofDays(7));
         // 로그인 실패 횟수 초기화
         member.setFailedLoginAttempts(0);
         memberRepository.save(member);
+        return refreshToken;
     }
 
     // 로그인 시 Role 확인 및 복구 로직

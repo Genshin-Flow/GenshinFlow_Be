@@ -86,17 +86,13 @@ public class AuthController implements AuthAPI {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<TokenResponse> refreshAccessToken(@RequestHeader(value = "AccessToken", required = false) String accessTokenHeader,
-                                                            @RequestHeader(value = "RefreshToken", required = false) String refreshTokenHeader) {
-
-        if (accessTokenHeader == null || accessTokenHeader.isBlank())
-            throw new BusinessLogicException(ExceptionCode.ACCESS_TOKEN_REQUIRED);
-
+    public ResponseEntity<TokenResponse> refreshAccessToken(
+        @RequestHeader(value = "RefreshToken", required = false) String refreshTokenHeader
+    ) {
         if (refreshTokenHeader == null || refreshTokenHeader.isBlank())
             throw new BusinessLogicException(ExceptionCode.REFRESH_TOKEN_REQUIRED);
 
         TokenResponse tokenResponse = tokenService.refreshAccessToken(
-            accessTokenHeader.replace("Bearer ", ""),
             refreshTokenHeader.replace("Bearer ", "")
         );
         return ResponseEntity.ok(tokenResponse);

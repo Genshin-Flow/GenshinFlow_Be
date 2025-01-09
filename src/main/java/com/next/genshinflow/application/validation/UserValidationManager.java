@@ -53,17 +53,13 @@ public class UserValidationManager {
         }
     }
 
-    // 액세스 토큰 검증
-    public void validateValidAccessToken(String accessToken) {
-        tokenProvider.validateToken(accessToken);
-    }
-
     // 리프레시 토큰 검증
-    public void validateMatchingRefreshToken(String clientRefreshToken, String storedRefreshToken) {
-        if (storedRefreshToken == null || !storedRefreshToken.equals(clientRefreshToken)) {
-            log.error("Refresh token validation failed: Provided token does not match stored token. Client token: {}, Stored token: {}",
-                clientRefreshToken, storedRefreshToken);
+    public void validateMatchingRefreshToken(String refreshToken) {
+        String refreshTokenFromRedis = redisRepository.getData(refreshToken);
+        System.out.println(refreshTokenFromRedis);
 
+        if (refreshTokenFromRedis == null) {
+            log.error("Refresh token not found in Redis: {}", refreshToken);
             throw new BusinessLogicException(ExceptionCode.INVALID_REFRESH_TOKEN);
         }
     }

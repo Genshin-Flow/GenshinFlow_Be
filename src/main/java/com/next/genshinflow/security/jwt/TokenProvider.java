@@ -102,20 +102,20 @@ public class TokenProvider implements InitializingBean {
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
 
-    public Claims getUserInfoFromToken(String token) {
-        try {
-            return Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-        }
-        // 만료된 경우 Claims에서 정보 추출
-        catch (ExpiredJwtException e) {
-            log.info("Token is expired, retrieving claims from expired token.");
-            return e.getClaims();
-        }
-    }
+//    public Claims getUserInfoFromToken(String token) {
+//        try {
+//            return Jwts.parserBuilder()
+//                .setSigningKey(key)
+//                .build()
+//                .parseClaimsJws(token)
+//                .getBody();
+//        }
+//        // 만료된 경우 Claims에서 정보 추출
+//        catch (ExpiredJwtException e) {
+//            log.info("Token is expired, retrieving claims from expired token.");
+//            return e.getClaims();
+//        }
+//    }
 
     // 검증
     public void validateToken(String token) {
