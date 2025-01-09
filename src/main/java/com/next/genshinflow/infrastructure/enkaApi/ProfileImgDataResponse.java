@@ -1,4 +1,4 @@
-package com.next.genshinflow.application.user.dto.enkaApi;
+package com.next.genshinflow.infrastructure.enkaApi;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

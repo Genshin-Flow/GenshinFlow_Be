@@ -1,5 +1,7 @@
 package com.next.genshinflow.security.jwt;
 
+import com.next.genshinflow.exception.BusinessLogicException;
+import com.next.genshinflow.exception.ExceptionCode;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -100,49 +102,49 @@ public class TokenProvider implements InitializingBean {
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
 
-    public Claims getUserInfoFromToken(String token) {
-        try {
-            return Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-        }
-        // 만료된 경우 Claims에서 정보 추출
-        catch (ExpiredJwtException e) {
-            log.info("Token is expired, retrieving claims from expired token.");
-            return e.getClaims();
-        }
-    }
+//    public Claims getUserInfoFromToken(String token) {
+//        try {
+//            return Jwts.parserBuilder()
+//                .setSigningKey(key)
+//                .build()
+//                .parseClaimsJws(token)
+//                .getBody();
+//        }
+//        // 만료된 경우 Claims에서 정보 추출
+//        catch (ExpiredJwtException e) {
+//            log.info("Token is expired, retrieving claims from expired token.");
+//            return e.getClaims();
+//        }
+//    }
 
     // 검증
-    public boolean validateToken(String token) {
+    public void validateToken(String token) {
         try {
             Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token);
-            return true;
+
         }
-        catch (ExpiredJwtException e) {
-            log.warn("만료된 JWT 토큰입니다.");
-            return false;
+        catch (BusinessLogicException e) {
+            log.error("만료된 JWT 토큰입니다.");
+            throw new BusinessLogicException(ExceptionCode.JWT_TOKEN_EXPIRED);
         }
         catch (UnsupportedJwtException e) {
-            log.warn("지원되지 않는 JWT 토큰입니다.");
-            return false;
+            log.error("지원되지 않는 JWT 토큰입니다.");
+            throw new BusinessLogicException(ExceptionCode.JWT_TOKEN_UNSUPPORTED);
         }
         catch (MalformedJwtException e) {
-            log.warn("JWT 토큰이 잘못되었습니다.");
-            return false;
+            log.error("JWT 토큰이 잘못되었습니다.");
+            throw new BusinessLogicException(ExceptionCode.JWT_TOKEN_MALFORMED);
         }
         catch (SecurityException e) {
-            log.warn("잘못된 JWT 서명입니다.");
-            return false;
+            log.error("잘못된 JWT 서명입니다.");
+            throw new BusinessLogicException(ExceptionCode.JWT_SIGNATURE_INVALID);
         }
         catch (IllegalArgumentException e) {
             log.error("잘못된 JWT 입력값이 제공되었습니다.");
-            return false;
+            throw new BusinessLogicException(ExceptionCode.JWT_TOKEN_MALFORMED);
         }
     }
 }

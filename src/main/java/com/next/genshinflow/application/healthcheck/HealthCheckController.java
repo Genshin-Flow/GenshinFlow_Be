@@ -1,4 +1,4 @@
-package com.next.genshinflow.application.healthcheck.controller;
+package com.next.genshinflow.application.healthcheck;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

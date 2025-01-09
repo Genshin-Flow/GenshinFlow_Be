@@ -5,25 +5,20 @@ import com.next.genshinflow.enumeration.Region;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 
 @Getter
 public class PostModifyRequest {
-    @Schema(description = "포스트 id", type = "long", example = "1")
-    @NotNull
+    @Schema(description = "포스트 Id", type = "long", example = "1")
+    @Positive(message = "포스트 Id를 입력해 주세요.")
     private long postId;
 
     @Schema(description = "비회원 게시물 비밀번호 (비회원일 경우만)", type = "String", example = "abcd1234!")
     private String password;
 
-    @Schema(description = "이야기 (요청글 제목)", type = "String", example = "집가고싶어요")
-    private String title;
-
     @Schema(description = "작성자 uid (비회원일 경우만)", type = "long", example = "123415456446")
     private long uid;
-
-    @Schema(description = "서버", type = "Region", example = "ASIA")
-    private Region region;
 
     @Schema(description = "퀘스트 종류", type = "QuestCategory", example = "something")
     private QuestCategory questCategory;
@@ -35,6 +30,6 @@ public class PostModifyRequest {
     private String content;
 
     @Schema(description = "자동 완료 시간", type = "int", example = "60")
-    @Min(30)
+    @Min(value = 30, message = "자동 완료 시간은 30분 이상이어야 합니다.")
     private int autoCompleteTime;
 }

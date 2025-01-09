@@ -6,10 +6,12 @@ import com.next.genshinflow.application.post.dto.PostModifyRequest;
 import com.next.genshinflow.application.post.dto.PostResponse;
 import com.next.genshinflow.application.post.dto.PostCreateRequest;
 import com.next.genshinflow.application.post.mapper.PostMapper;
-import com.next.genshinflow.application.user.service.AuthService;
+import com.next.genshinflow.application.EntityFinder;
+import com.next.genshinflow.application.validation.PostValidationManager;
 import com.next.genshinflow.domain.post.entity.PostEntity;
 import com.next.genshinflow.domain.post.repository.PostRepository;
 import com.next.genshinflow.domain.user.entity.MemberEntity;
+import com.next.genshinflow.enumeration.Region;
 import com.next.genshinflow.exception.BusinessLogicException;
 import com.next.genshinflow.exception.ExceptionCode;
 import lombok.RequiredArgsConstructor;
@@ -27,33 +29,49 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class PostService {
-    private final AuthService authService;
+    private final EntityFinder entityFinder;
     private final PostRepository postRepository;
+    private final PostValidationManager validationManager;
 
     public PostResponse createUserPost(PostCreateRequest request) {
-        MemberEntity member = authService.getCurrentMember();
+        MemberEntity member = entityFinder.getCurrentMember();
         return savePost(request, member);
     }
 
     public PostResponse createGuestPost(PostCreateRequest request) {
-        if (request.getUid() <= 0) {
-            throw new BusinessLogicException(ExceptionCode.UID_REQUIRED_FOR_GUEST);
-        }
-
-        if (request.getPassword() == null) {
-            throw new BusinessLogicException(ExceptionCode.PASSWORD_REQUIRED_FOR_GUEST);
-        }
-
+        validationManager.validateGuestPost(request.getUid(), request.getPassword());
         return savePost(request, null);
     }
 
     private PostResponse savePost(PostCreateRequest request, MemberEntity member) {
         LocalDateTime completedAt = LocalDateTime.now().plusMinutes(request.getAutoCompleteTime());
 
-        PostEntity post = PostMapper.toPost(request, member, completedAt);
+        Region region = (member != null) ? determineRegion(member.getUid()) : determineRegion(request.getUid());
+        PostEntity post = PostMapper.toPost(request, member, region, completedAt);
 
         PostEntity savedPost = postRepository.save(post);
         return PostMapper.toResponse(savedPost);
+    }
+
+    private Region determineRegion(long uid) {
+        String uidString = Long.toString(uid);
+
+        if (uidString.length() != 9 && uidString.length() != 10) {
+            return Region.NA;
+        }
+
+        int serverNum = uidString.length() == 9
+            ? Character.getNumericValue(uidString.charAt(0))
+            : Character.getNumericValue(uidString.charAt(1));
+
+        return switch (serverNum) {
+            case 1, 2, 3, 4, 5 -> Region.CHINA;
+            case 6 -> Region.AMERICA;
+            case 7 -> Region.EUROPE;
+            case 8 -> Region.ASIA;
+            case 9 -> Region.TW_HK_MO;
+            default -> Region.NA;
+        };
     }
 
     // 게시물 전체 조회
@@ -65,7 +83,6 @@ public class PostService {
         autoCompletedPost(pageable);
 
         Page<PostResponse> postResponsePage = postPage.map(PostMapper::toResponse);
-
         return new BasePageResponse<>(
             postResponsePage.getContent(),
             postResponsePage.getNumber() + 1,
@@ -77,12 +94,12 @@ public class PostService {
 
     // 게시물 완료 처리
     public void completeUserPost(long postId) {
-        completePost(validatePost(postId, null));
+        completePost(validationManager.authorizePostAccess(postId, null));
     }
 
     // 비회원 게시물 완료 처리
     public void completeGuestPost(GuestPostActionRequest request) {
-        completePost(validatePost(request.getPostId(), request.getPassword()));
+        completePost(validationManager.authorizePostAccess(request.getPostId(), request.getPassword()));
     }
 
     private void completePost(PostEntity post) {
@@ -104,19 +121,17 @@ public class PostService {
             }
         }
 
-        if (!postsToSave.isEmpty()) {
-            postRepository.saveAll(postsToSave);
-        }
+        if (!postsToSave.isEmpty()) postRepository.saveAll(postsToSave);
     }
 
     // 게시물 수정
     public PostResponse modifyUserPost(PostModifyRequest request) {
-        return modifyPost(validatePost(request.getPostId(), null), request);
+        return modifyPost(validationManager.authorizePostAccess(request.getPostId(), null), request);
     }
 
     // 비회원 게시물 수정
     public PostResponse modifyGuestPost(PostModifyRequest request) {
-        PostEntity post = validatePost(request.getPostId(), request.getPassword());
+        PostEntity post = validationManager.authorizePostAccess(request.getPostId(), request.getPassword());
         return modifyPost(post, request);
     }
 
@@ -128,12 +143,12 @@ public class PostService {
 
     // 끌올
     public void pullUpUserPost(long postId) {
-        pullUpPost(validatePost(postId, null));
+        pullUpPost(validationManager.authorizePostAccess(postId, null));
     }
 
     // 비회원 끌올
     public void pullUpGuestPost(GuestPostActionRequest request) {
-        pullUpPost(validatePost(request.getPostId(), request.getPassword()));
+        pullUpPost(validationManager.authorizePostAccess(request.getPostId(), request.getPassword()));
     }
 
     private void pullUpPost(PostEntity post) {
@@ -142,11 +157,11 @@ public class PostService {
     }
 
     public void deleteUserPost(long postId) {
-        deletePost(validatePost(postId, null));
+        deletePost(validationManager.authorizePostAccess(postId, null));
     }
 
     public void deleteGuestPost(GuestPostActionRequest request) {
-        deletePost(validatePost(request.getPostId(), request.getPassword()));
+        deletePost(validationManager.authorizePostAccess(request.getPostId(), request.getPassword()));
     }
 
     private void deletePost(PostEntity post) {
@@ -156,32 +171,5 @@ public class PostService {
         catch (EmptyResultDataAccessException e) {
             throw new BusinessLogicException(ExceptionCode.POST_NOT_FOUND);
         }
-    }
-
-    private PostEntity validatePost(long postId, String password) {
-        PostEntity post = findPost(postId);
-
-        if (password == null) {
-            MemberEntity member = authService.getCurrentMember();
-
-            if (!post.getWriter().getId().equals(member.getId())) {
-                throw new BusinessLogicException(ExceptionCode.NO_PERMISSION);
-            }
-
-            return post;
-        }
-        else {
-            if (!post.getPassword().equals(password)) {
-                throw new BusinessLogicException(ExceptionCode.INVALID_POST_PASSWORD);
-            }
-
-            return post;
-        }
-    }
-
-    public PostEntity findPost(long postId) {
-        return postRepository.findById(postId)
-            .orElseThrow(() ->
-                new BusinessLogicException(ExceptionCode.POST_NOT_FOUND));
     }
 }

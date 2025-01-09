@@ -1,7 +1,7 @@
 package com.next.genshinflow.config;
 
-import com.next.genshinflow.infrastructure.EnkaClient;
-import com.next.genshinflow.infrastructure.EnkaClientErrorHandler;
+import com.next.genshinflow.infrastructure.enkaApi.EnkaClient;
+import com.next.genshinflow.infrastructure.enkaApi.EnkaClientErrorHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

@@ -10,10 +10,10 @@ import lombok.*;
 @NoArgsConstructor
 public class LoginRequest {
     @Schema(description = "사용자 이메일", type = "String", example = "user@example.com")
-    @NotBlank
+    @NotBlank(message = "이메일을 입력해 주세요.")
     private String email;
 
     @Schema(description = "사용자 비밀번호", type = "String", example = "example1234!")
-    @NotBlank
+    @NotBlank(message = "비밀번호를 입력해 주세요.")
     private String password;
 }

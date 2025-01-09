@@ -2,6 +2,11 @@ spring:
   config:
     activate:
       on-profile: local
+  mvc:
+    throw-exception-if-no-handler-found: true
+  web:
+    resources:
+      add-mappings: false
   datasource:
     driver-class-name: org.h2.Driver
     jdbc-url: jdbc:h2:mem:test
