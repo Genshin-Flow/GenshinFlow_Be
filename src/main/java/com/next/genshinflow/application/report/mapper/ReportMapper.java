@@ -13,7 +13,7 @@ public class ReportMapper {
         ReportEntity report = new ReportEntity();
         report.setReportingUser(reportingUser);
         report.setTargetUser(targetUser);
-        report.setContent(reportRequest.getContent());
+        report.setReason(reportRequest.getReason());
         report.setImages(reportRequest.getImages());
         report.setReportStatus(ReportStatus.UNPROCESSED);
 
@@ -27,7 +27,7 @@ public class ReportMapper {
             .id(report.getId())
             .reportingUserEmail(report.getReportingUser().getEmail())
             .targetUserEmail(report.getTargetUser().getEmail())
-            .content(report.getContent())
+            .reason(report.getReason())
             .images(report.getImages())
             .reportStatus(report.getReportStatus())
             .createdAt(report.getCreatedAt())

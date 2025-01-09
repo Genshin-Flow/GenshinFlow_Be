@@ -5,20 +5,20 @@ import com.next.genshinflow.application.post.dto.PostResponse;
 import com.next.genshinflow.application.post.dto.PostCreateRequest;
 import com.next.genshinflow.domain.post.entity.PostEntity;
 import com.next.genshinflow.domain.user.entity.MemberEntity;
+import com.next.genshinflow.enumeration.Region;
 
 import java.time.LocalDateTime;
 
 public class PostMapper {
     private PostMapper() {}
 
-    public static PostEntity toPost(PostCreateRequest request, MemberEntity writer, LocalDateTime completedAt) {
+    public static PostEntity toPost(PostCreateRequest request, MemberEntity writer, Region region, LocalDateTime completedAt) {
         long uid = (request.getUid() != 0) ? request.getUid() : writer.getUid();
 
         PostEntity post = new PostEntity();
         post.setWriter(writer);
-        post.setTitle(request.getTitle());
         post.setUid(uid);
-        post.setRegion(request.getRegion());
+        post.setRegion(region);
         post.setQuestCategory(request.getQuestCategory());
         post.setWorldLevel(request.getWorldLevel());
         post.setContent(request.getContent());
@@ -30,9 +30,7 @@ public class PostMapper {
     }
 
     public static void toUpdatedPost(PostEntity post, PostModifyRequest request) {
-        if (request.getTitle() != null) post.setTitle(request.getTitle());
         if (request.getUid() != 0) post.setUid(request.getUid());
-        if (request.getRegion() != null) post.setRegion(request.getRegion());
         if (request.getQuestCategory() != null) post.setQuestCategory(request.getQuestCategory());
         if (request.getWordLevel() != 0) post.setWorldLevel(request.getWordLevel());
         if (request.getContent() != null) post.setContent(request.getContent());
@@ -57,7 +55,6 @@ public class PostMapper {
             .id(post.getId())
             .writerEmail(writerEmail)
             .writerName(writerName)
-            .title(post.getTitle())
             .uid(post.getUid())
             .region(post.getRegion())
             .questCategory(post.getQuestCategory())

@@ -36,9 +36,6 @@ public class PostEntity extends BaseEntity {
     @JoinColumn(name = "writer_id")
     private MemberEntity writer;
 
-    @Column(name = "title", length = 20)
-    private String title;
-
     @Column(name = "uid")
     private Long uid;
 

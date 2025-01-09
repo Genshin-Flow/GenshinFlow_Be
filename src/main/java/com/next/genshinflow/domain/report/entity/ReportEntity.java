@@ -36,7 +36,7 @@ public class ReportEntity extends BaseEntity {
     private MemberEntity targetUser;
 
     @Column(name = "content")
-    private String content;
+    private String reason;
 
     @ElementCollection
     @CollectionTable(name = "report_images", joinColumns = @JoinColumn(name = "report_id"))

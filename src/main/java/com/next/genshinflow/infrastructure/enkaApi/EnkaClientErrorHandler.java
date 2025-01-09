@@ -1,4 +1,4 @@
-package com.next.genshinflow.infrastructure;
+package com.next.genshinflow.infrastructure.enkaApi;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.client.ClientHttpResponse;
