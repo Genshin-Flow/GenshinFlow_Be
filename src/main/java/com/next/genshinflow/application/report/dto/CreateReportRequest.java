@@ -14,7 +14,7 @@ public class CreateReportRequest {
 
     @Schema(description = "신고 사유", type = "String", example = "상업적/홍보성")
     @NotBlank(message = "신고 사유를 입력해 주세요.")
-    private String reportReason;
+    private String reason;
 
     @Schema(description = "신고 이미지들", type = "List<String>")
     private List<String> images;
