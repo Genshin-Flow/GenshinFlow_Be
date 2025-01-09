@@ -1,6 +1,5 @@
 package com.next.genshinflow.application.report.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.next.genshinflow.enumeration.ReportStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
