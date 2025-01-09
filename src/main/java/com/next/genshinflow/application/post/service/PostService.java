@@ -11,6 +11,7 @@ import com.next.genshinflow.application.validation.PostValidationManager;
 import com.next.genshinflow.domain.post.entity.PostEntity;
 import com.next.genshinflow.domain.post.repository.PostRepository;
 import com.next.genshinflow.domain.user.entity.MemberEntity;
+import com.next.genshinflow.enumeration.Region;
 import com.next.genshinflow.exception.BusinessLogicException;
 import com.next.genshinflow.exception.ExceptionCode;
 import lombok.RequiredArgsConstructor;
@@ -45,10 +46,32 @@ public class PostService {
     private PostResponse savePost(PostCreateRequest request, MemberEntity member) {
         LocalDateTime completedAt = LocalDateTime.now().plusMinutes(request.getAutoCompleteTime());
 
-        PostEntity post = PostMapper.toPost(request, member, completedAt);
+        Region region = (member != null) ? determineRegion(member.getUid()) : determineRegion(request.getUid());
+        PostEntity post = PostMapper.toPost(request, member, region, completedAt);
 
         PostEntity savedPost = postRepository.save(post);
         return PostMapper.toResponse(savedPost);
+    }
+
+    private Region determineRegion(long uid) {
+        String uidString = Long.toString(uid);
+
+        if (uidString.length() != 9 && uidString.length() != 10) {
+            return Region.NA;
+        }
+
+        int serverNum = uidString.length() == 9
+            ? Character.getNumericValue(uidString.charAt(0))
+            : Character.getNumericValue(uidString.charAt(1));
+
+        return switch (serverNum) {
+            case 1, 2, 3, 4, 5 -> Region.CHINA;
+            case 6 -> Region.AMERICA;
+            case 7 -> Region.EUROPE;
+            case 8 -> Region.ASIA;
+            case 9 -> Region.TW_HK_MO;
+            default -> Region.NA;
+        };
     }
 
     // 게시물 전체 조회
