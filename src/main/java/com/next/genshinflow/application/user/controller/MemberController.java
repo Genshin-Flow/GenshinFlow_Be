@@ -36,6 +36,7 @@ public class MemberController implements MemberAPI {
     }
 
     @GetMapping("/my-post")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<List<PostResponse>> getMyPosts(
         @Positive @RequestParam(value = "page", defaultValue = "1") int page,
         @Positive @RequestParam(value = "size", defaultValue = "10") int size
@@ -52,6 +53,7 @@ public class MemberController implements MemberAPI {
     }
 
     @PatchMapping("/change-password")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
         memberService.changePassword(request);
         return ResponseEntity.ok().build();

@@ -5,6 +5,7 @@ import com.next.genshinflow.application.user.dto.member.ChangePasswordRequest;
 import com.next.genshinflow.application.user.dto.member.ChangeUidRequest;
 import com.next.genshinflow.application.user.dto.member.MemberResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
@@ -18,27 +19,41 @@ import java.util.List;
 
 @Tag(name = "Member", description = "회원 관련 API")
 public interface MemberAPI {
-    @Operation(summary = "내 정보 조회")
+    @Operation(
+        summary = "내 정보 조회",
+        description = "bearerAuth = User, Admin",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
     ResponseEntity<MemberResponse> getMyInfo();
 
     @Operation(
         summary = "유저 정보 조회",
-        description = "유저 ID로 정보를 조회함. 이 엔드포인트는 관리자 권한이 필요함."
+        description = "유저 ID로 정보를 조회함. 이 엔드포인트는 관리자 권한이 필요함. / bearerAuth = Admin",
+        security = @SecurityRequirement(name = "bearerAuth")
     )
     ResponseEntity<MemberResponse> getUserInfo(@Email @PathVariable String email);
 
     @Operation(
         summary = "자신이 작성한 포스팅 목록",
-        description = "size = 10"
+        description = "size = 10 / bearerAuth = User, Admin",
+        security = @SecurityRequirement(name = "bearerAuth")
     )
     ResponseEntity<List<PostResponse>> getMyPosts(
         @Positive @RequestParam(value = "page", defaultValue = "1") int page,
         @Positive @RequestParam(value = "size", defaultValue = "10") int size
     );
 
-    @Operation(summary = "UID 변경")
+    @Operation(
+        summary = "UID 변경",
+        description = "bearerAuth = User, Admin",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
     ResponseEntity<MemberResponse> updateUid(@Valid @RequestBody ChangeUidRequest request);
 
-    @Operation(summary = "비밀번호 변경", description = "이메일 인증(/verification-code/send) 후 유저의 비밀번호 변경")
+    @Operation(
+        summary = "비밀번호 변경",
+        description = "이메일 인증(/verification-code/send) 후 유저의 비밀번호 변경 / bearerAuth = User, Admin",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
     ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordRequest request);
 }
