@@ -11,12 +11,18 @@ import com.next.genshinflow.domain.utils.UriCreator;
 import com.next.genshinflow.exception.BusinessLogicException;
 import com.next.genshinflow.exception.ExceptionCode;
 import com.next.genshinflow.security.jwt.JwtFilter;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.event.LogoutSuccessEvent;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,6 +37,7 @@ public class AuthController implements AuthAPI {
     private final SignUpService signUpService;
     private final SignInService signInService;
     private final TokenService tokenService;
+    private final ApplicationEventPublisher eventPublisher;
 
 
     @PostMapping("/verification-code/send")
@@ -96,5 +103,16 @@ public class AuthController implements AuthAPI {
             refreshTokenHeader.replace("Bearer ", "")
         );
         return ResponseEntity.ok(tokenResponse);
+    }
+
+    @PostMapping("/logout")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public ResponseEntity<Void> logout() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null)
+            eventPublisher.publishEvent(new LogoutSuccessEvent(authentication));
+
+        return ResponseEntity.ok().build();
     }
 }
