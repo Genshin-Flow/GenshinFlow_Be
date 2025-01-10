@@ -28,14 +28,14 @@ public interface MemberAPI {
 
     @Operation(
         summary = "유저 정보 조회",
-        description = "유저 ID로 정보를 조회함. 이 엔드포인트는 관리자 권한이 필요함. / bearerAuth = Admin",
+        description = "bearerAuth = Admin / 유저 ID로 정보를 조회함. 이 엔드포인트는 관리자 권한이 필요함.",
         security = @SecurityRequirement(name = "bearerAuth")
     )
     ResponseEntity<MemberResponse> getUserInfo(@Email @PathVariable String email);
 
     @Operation(
         summary = "자신이 작성한 포스팅 목록",
-        description = "size = 10 / bearerAuth = User, Admin",
+        description = "bearerAuth = User, Admin / size = 10",
         security = @SecurityRequirement(name = "bearerAuth")
     )
     ResponseEntity<List<PostResponse>> getMyPosts(
@@ -52,7 +52,7 @@ public interface MemberAPI {
 
     @Operation(
         summary = "비밀번호 변경",
-        description = "이메일 인증(/verification-code/send) 후 유저의 비밀번호 변경 / bearerAuth = User, Admin",
+        description = "bearerAuth = User, Admin / 이메일 인증(/verification-code/send) 후 유저의 비밀번호 변경",
         security = @SecurityRequirement(name = "bearerAuth")
     )
     ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordRequest request);
