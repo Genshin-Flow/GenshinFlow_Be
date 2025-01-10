@@ -19,4 +19,6 @@ import java.util.List;
 public interface PostRepository extends JpaRepository<PostEntity, Long> {
     Page<PostEntity> findByWriter_Id(long writerId, Pageable pageable);
     Page<PostEntity> findByCompletedFalse(Pageable pageable);
+    @Query("SELECT COUNT(p) FROM PostEntity p WHERE FUNCTION('DATE', p.createdAt) = CURRENT_DATE")
+    int countTodayPosts();
 }

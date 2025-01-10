@@ -43,4 +43,10 @@ public interface AuthAPI {
     ResponseEntity<TokenResponse> refreshAccessToken(
         @RequestHeader(value = "RefreshToken", required = false) String refreshTokenHeader
     );
+
+    @Operation(
+        summary = "로그아웃",
+        description = "bearerAuth = User, Admin / Dashboard Status에 사용됨"
+    )
+    ResponseEntity<Void> logout();
 }
