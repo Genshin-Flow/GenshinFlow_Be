@@ -11,7 +11,6 @@ import com.next.genshinflow.domain.utils.UriCreator;
 import com.next.genshinflow.exception.BusinessLogicException;
 import com.next.genshinflow.exception.ExceptionCode;
 import com.next.genshinflow.security.jwt.JwtFilter;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -94,13 +93,13 @@ public class AuthController implements AuthAPI {
 
     @PostMapping("/refresh")
     public ResponseEntity<TokenResponse> refreshAccessToken(
-        @RequestHeader(value = "RefreshToken", required = false) String refreshTokenHeader
+        @Valid @RequestBody RefreshTokenRequest request
     ) {
-        if (refreshTokenHeader == null || refreshTokenHeader.isBlank())
+        if (request.getRefreshToken() == null || request.getRefreshToken().isBlank())
             throw new BusinessLogicException(ExceptionCode.REFRESH_TOKEN_REQUIRED);
 
         TokenResponse tokenResponse = tokenService.refreshAccessToken(
-            refreshTokenHeader.replace("Bearer ", "")
+            request.getRefreshToken().replace("Bearer ", "")
         );
         return ResponseEntity.ok(tokenResponse);
     }

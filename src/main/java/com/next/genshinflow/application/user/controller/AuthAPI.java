@@ -41,7 +41,7 @@ public interface AuthAPI {
         description = "리프레시 토큰을 이용해 만료된 액세스 토큰을 갱신함."
     )
     ResponseEntity<TokenResponse> refreshAccessToken(
-        @RequestHeader(value = "RefreshToken", required = false) String refreshTokenHeader
+        @Valid @RequestBody RefreshTokenRequest request
     );
 
     @Operation(
