@@ -55,8 +55,8 @@ public class UserValidationManager {
 
     // 리프레시 토큰 검증
     public void validateMatchingRefreshToken(String refreshToken) {
-        String refreshTokenFromRedis = redisRepository.getData(refreshToken);
-        System.out.println(refreshTokenFromRedis);
+        String subject = tokenProvider.getSubjectFromRefreshToken(refreshToken);
+        String refreshTokenFromRedis = redisRepository.getData(subject);
 
         if (refreshTokenFromRedis == null) {
             log.error("Refresh token not found in Redis: {}", refreshToken);
