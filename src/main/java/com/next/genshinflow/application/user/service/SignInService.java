@@ -80,7 +80,7 @@ public class SignInService {
         checkAndUpdateDisciplinaryStatus(member.getId());
         // 로그인 성공 시 Redis에 RefreshToken 저장
         String refreshToken = tokenProvider.generateRefreshToken(authentication);
-        redisRepository.setData(refreshToken, member.getEmail(), Duration.ofDays(7));
+        redisRepository.setData(member.getEmail(), refreshToken, Duration.ofDays(7));
         // 로그인 실패 횟수 초기화
         member.setFailedLoginAttempts(0);
         memberRepository.save(member);

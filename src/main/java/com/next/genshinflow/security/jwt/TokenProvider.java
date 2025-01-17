@@ -102,6 +102,16 @@ public class TokenProvider implements InitializingBean {
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
 
+    public String getSubjectFromRefreshToken(String refreshToken) {
+        Claims claims = Jwts.parserBuilder()
+            .setSigningKey(key)
+            .build()
+            .parseClaimsJws(refreshToken)
+            .getBody();
+
+        return claims.getSubject();
+    }
+
 //    public Claims getUserInfoFromToken(String token) {
 //        try {
 //            return Jwts.parserBuilder()
