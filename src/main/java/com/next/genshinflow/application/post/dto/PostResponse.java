@@ -1,6 +1,5 @@
 package com.next.genshinflow.application.post.dto;
 
-import com.next.genshinflow.enumeration.QuestCategory;
 import com.next.genshinflow.enumeration.Region;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -22,7 +21,7 @@ public class PostResponse {
     @Schema(description = "서버", type = "Region", example = "ASIA")
     private Region region;
     @Schema(description = "퀘스트 종류", type = "QuestCategory", example = "something")
-    private QuestCategory questCategory;
+    private String questCategory;
     @Schema(description = "월드 레벨", type = "int", example = "7")
     private int wordLevel;
     @Schema(description = "게시물 내용", type = "String", example = "날 구원해 줄 사람 어디 없나")

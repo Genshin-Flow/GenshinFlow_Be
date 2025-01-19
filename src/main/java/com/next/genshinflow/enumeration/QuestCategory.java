@@ -3,6 +3,8 @@ package com.next.genshinflow.enumeration;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Arrays;
+
 @Getter
 @RequiredArgsConstructor
 public enum QuestCategory {
@@ -14,4 +16,13 @@ public enum QuestCategory {
     GATHERING("채집");
 
     private final String category;
+
+    public static QuestCategory fromCategoryName(String categoryName) {
+        return Arrays.stream(values())
+            .filter(qc -> qc.category.equals(categoryName))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException(
+                "유효하지 않은 퀘스트 종류입니다: " + categoryName + ". 가능한 값: " + Arrays.toString(values())
+            ));
+    }
 }
