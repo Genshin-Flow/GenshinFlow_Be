@@ -14,6 +14,7 @@ import com.next.genshinflow.domain.user.entity.MemberEntity;
 import com.next.genshinflow.enumeration.Region;
 import com.next.genshinflow.exception.BusinessLogicException;
 import com.next.genshinflow.exception.ExceptionCode;
+import com.next.genshinflow.infrastructure.enkaApi.EnkaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
@@ -32,6 +33,7 @@ public class PostService {
     private final EntityFinder entityFinder;
     private final PostRepository postRepository;
     private final PostValidationManager validationManager;
+    private final EnkaService enkaService;
 
     public PostResponse createUserPost(PostCreateRequest request) {
         MemberEntity member = entityFinder.getCurrentMember();
@@ -44,10 +46,12 @@ public class PostService {
     }
 
     private PostResponse savePost(PostCreateRequest request, MemberEntity member) {
+        Region region = (member != null) ? determineRegion(member.getUid()) : determineRegion(request.getUid());
         LocalDateTime completedAt = LocalDateTime.now().plusMinutes(request.getAutoCompleteTime());
 
-        Region region = (member != null) ? determineRegion(member.getUid()) : determineRegion(request.getUid());
-        PostEntity post = PostMapper.toPost(request, member, region, completedAt);
+        PostEntity post = (member != null)
+            ? PostMapper.toPost(request, member, region, completedAt)
+            : PostMapper.toGuestPost(request, enkaService.getUserInfoFromApi(request.getUid()), region, completedAt);
 
         PostEntity savedPost = postRepository.save(post);
         return PostMapper.toResponse(savedPost);
