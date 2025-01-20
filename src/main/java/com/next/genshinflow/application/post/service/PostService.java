@@ -14,12 +14,14 @@ import com.next.genshinflow.domain.user.entity.MemberEntity;
 import com.next.genshinflow.enumeration.Region;
 import com.next.genshinflow.exception.BusinessLogicException;
 import com.next.genshinflow.exception.ExceptionCode;
+import com.next.genshinflow.infrastructure.enkaApi.EnkaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -32,6 +34,7 @@ public class PostService {
     private final EntityFinder entityFinder;
     private final PostRepository postRepository;
     private final PostValidationManager validationManager;
+    private final EnkaService enkaService;
 
     public PostResponse createUserPost(PostCreateRequest request) {
         MemberEntity member = entityFinder.getCurrentMember();
@@ -44,10 +47,12 @@ public class PostService {
     }
 
     private PostResponse savePost(PostCreateRequest request, MemberEntity member) {
+        Region region = (member != null) ? determineRegion(member.getUid()) : determineRegion(request.getUid());
         LocalDateTime completedAt = LocalDateTime.now().plusMinutes(request.getAutoCompleteTime());
 
-        Region region = (member != null) ? determineRegion(member.getUid()) : determineRegion(request.getUid());
-        PostEntity post = PostMapper.toPost(request, member, region, completedAt);
+        PostEntity post = (member != null)
+            ? PostMapper.toPost(request, member, region, completedAt)
+            : PostMapper.toGuestPost(request, enkaService.getUserInfoFromApi(request.getUid()), region, completedAt);
 
         PostEntity savedPost = postRepository.save(post);
         return PostMapper.toResponse(savedPost);
@@ -78,6 +83,34 @@ public class PostService {
     public BasePageResponse<PostResponse> getPosts(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("sortedAt").descending());
         Page<PostEntity> postPage = postRepository.findAll(pageable);
+
+        // 게시물 자동 완료 처리
+        autoCompletedPost(pageable);
+
+        Page<PostResponse> postResponsePage = postPage.map(PostMapper::toResponse);
+        return new BasePageResponse<>(
+            postResponsePage.getContent(),
+            postResponsePage.getNumber() + 1,
+            postResponsePage.getSize(),
+            postResponsePage.getTotalElements(),
+            postResponsePage.getTotalPages()
+        );
+    }
+
+    public BasePageResponse<PostResponse> getFilteredPosts(
+        int page,
+        int size,
+        List<Region> regions,
+        List<String> questCategories,
+        List<Integer> worldLevels
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("sortedAt").descending());
+
+        Specification<PostEntity> spec = Specification.where(PostSpecification.filterByRegions(regions))
+            .and(PostSpecification.filterByQuestCategories(questCategories))
+            .and(PostSpecification.filterByWorldLevels(worldLevels));
+
+        Page<PostEntity> postPage = postRepository.findAll(spec, pageable);
 
         // 게시물 자동 완료 처리
         autoCompletedPost(pageable);

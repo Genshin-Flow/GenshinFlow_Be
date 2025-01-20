@@ -5,6 +5,7 @@ import com.next.genshinflow.application.post.dto.GuestPostActionRequest;
 import com.next.genshinflow.application.post.dto.PostCreateRequest;
 import com.next.genshinflow.application.post.dto.PostModifyRequest;
 import com.next.genshinflow.application.post.dto.PostResponse;
+import com.next.genshinflow.enumeration.Region;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 @Tag(name = "Posting", description = "포스팅 API")
 public interface PostAPI {
@@ -32,6 +35,15 @@ public interface PostAPI {
     ResponseEntity<BasePageResponse<PostResponse>> getPosts(
         @Positive @RequestParam(value = "page", defaultValue = "1") int page,
         @Positive @RequestParam(value = "size", defaultValue = "20") int size
+    );
+
+    @Operation(summary = "포스팅 필터 목록", description = "size = 20")
+    ResponseEntity<BasePageResponse<PostResponse>> getFilteredPosts(
+        @Positive @RequestParam(value = "page", defaultValue = "1") int page,
+        @Positive @RequestParam(value = "size", defaultValue = "20") int size,
+        @RequestParam(value = "region", required = false) List<Region> regions,
+        @RequestParam(value = "questCategory", required = false) List<String> questCategories,
+        @RequestParam(value = "worldLevel", required = false) List<Integer> worldLevels
     );
 
     @Operation(

@@ -39,6 +39,9 @@ public class PostEntity extends BaseEntity {
     @Column(name = "uid")
     private Long uid;
 
+    @Column(name = "name")
+    private String name;
+
     @Convert(converter = RegionConverter.class)
     @Column(name = "region")
     private Region region;

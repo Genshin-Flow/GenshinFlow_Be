@@ -6,6 +6,7 @@ import com.next.genshinflow.application.post.dto.PostModifyRequest;
 import com.next.genshinflow.application.post.dto.PostResponse;
 import com.next.genshinflow.application.post.dto.PostCreateRequest;
 import com.next.genshinflow.application.post.service.PostService;
+import com.next.genshinflow.enumeration.Region;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -14,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @RequestMapping("/postings")
@@ -40,6 +43,18 @@ public class PostController implements PostAPI {
         @Positive @RequestParam(value = "size", defaultValue = "20") int size
     ) {
         BasePageResponse<PostResponse> pageResponse = postService.getPosts(page-1, size);
+        return ResponseEntity.ok(pageResponse);
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<BasePageResponse<PostResponse>> getFilteredPosts(
+        @Positive @RequestParam(value = "page", defaultValue = "1") int page,
+        @Positive @RequestParam(value = "size", defaultValue = "20") int size,
+        @RequestParam(value = "region", required = false) List<Region> regions,
+        @RequestParam(value = "questCategory", required = false) List<String> questCategories,
+        @RequestParam(value = "worldLevel", required = false) List<Integer> worldLevels
+    ) {
+        BasePageResponse<PostResponse> pageResponse = postService.getFilteredPosts(page - 1, size, regions, questCategories, worldLevels);
         return ResponseEntity.ok(pageResponse);
     }
 
