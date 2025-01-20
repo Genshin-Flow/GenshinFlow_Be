@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -82,6 +83,34 @@ public class PostService {
     public BasePageResponse<PostResponse> getPosts(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("sortedAt").descending());
         Page<PostEntity> postPage = postRepository.findAll(pageable);
+
+        // 게시물 자동 완료 처리
+        autoCompletedPost(pageable);
+
+        Page<PostResponse> postResponsePage = postPage.map(PostMapper::toResponse);
+        return new BasePageResponse<>(
+            postResponsePage.getContent(),
+            postResponsePage.getNumber() + 1,
+            postResponsePage.getSize(),
+            postResponsePage.getTotalElements(),
+            postResponsePage.getTotalPages()
+        );
+    }
+
+    public BasePageResponse<PostResponse> getFilteredPosts(
+        int page,
+        int size,
+        List<Region> regions,
+        List<String> questCategories,
+        List<Integer> worldLevels
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("sortedAt").descending());
+
+        Specification<PostEntity> spec = Specification.where(PostSpecification.filterByRegions(regions))
+            .and(PostSpecification.filterByQuestCategories(questCategories))
+            .and(PostSpecification.filterByWorldLevels(worldLevels));
+
+        Page<PostEntity> postPage = postRepository.findAll(spec, pageable);
 
         // 게시물 자동 완료 처리
         autoCompletedPost(pageable);
