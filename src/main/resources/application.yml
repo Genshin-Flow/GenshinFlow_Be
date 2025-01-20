@@ -14,7 +14,7 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
         show-sql: false
         hbm2ddl:
-          auto: validate
+          auto: update
 
   mail:
     host: smtp.gmail.com
