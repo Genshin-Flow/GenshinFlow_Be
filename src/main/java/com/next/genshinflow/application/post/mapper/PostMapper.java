@@ -9,6 +9,7 @@ import com.next.genshinflow.enumeration.Region;
 import com.next.genshinflow.infrastructure.enkaApi.UserInfoResponse;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 public class PostMapper {
     private PostMapper() {}
@@ -57,15 +58,21 @@ public class PostMapper {
     public static PostResponse toResponse(PostEntity post) {
         if (post == null) return null;
 
-        String writerEmail = null;
-        if (post.getWriter() != null) {
-            writerEmail = post.getWriter().getEmail();
-        }
+        String writerEmail = Optional.ofNullable(post.getWriter())
+            .map(MemberEntity::getEmail)
+            .orElse(null);
+
+        String defaultProfileImg = "https://github.com/user-attachments/assets/c83bc4a3-00ef-48c8-99d2-66d33b45019b";
+
+        String profileImg = Optional.ofNullable(post.getWriter())
+            .map(MemberEntity::getImage)
+            .orElse(defaultProfileImg);
 
         return PostResponse.builder()
             .id(post.getId())
             .writerEmail(writerEmail)
             .writerName(post.getName())
+            .writerProfileImg(profileImg)
             .uid(post.getUid())
             .region(post.getRegion())
             .questCategory(post.getQuestCategory().getCategory())
