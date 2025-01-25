@@ -16,6 +16,8 @@ public class PostResponse {
     private String writerEmail;
     @Schema(description = "작성자 닉네임", type = "String", example = "잠자는 남도곰")
     private String writerName;
+    @Schema(description = "작성자 프로필 사진", type = "String")
+    private String writerProfileImg;
     @Schema(description = "작성자 uid", type = "long", example = "123415456446")
     private long uid;
     @Schema(description = "서버", type = "Region", example = "ASIA")
