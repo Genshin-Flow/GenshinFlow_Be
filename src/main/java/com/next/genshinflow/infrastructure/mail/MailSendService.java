@@ -23,7 +23,7 @@ public class MailSendService {
     private JavaMailSender mailSender;
     private RedisRepository redisRepository;
     private static final SecureRandom randomGenerator = new SecureRandom();
-    private static final Duration AUTH_NUM_EXPIRE_DURATION = Duration.ofSeconds(60);
+    private static final Duration AUTH_NUM_EXPIRE_DURATION = Duration.ofSeconds(180);
 
     public String generateAuthCode() {
         StringBuilder randomNum = new StringBuilder();
@@ -71,7 +71,7 @@ public class MailSendService {
             throw new RuntimeException("Failed to send email", e);
         }
 
-        // 인증번호는 1분동안 유효함
+        // 인증번호는 3분동안 유효함
         redisRepository.setData(authNum, toMail, AUTH_NUM_EXPIRE_DURATION);
     }
 }
