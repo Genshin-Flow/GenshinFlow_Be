@@ -1,5 +1,6 @@
 package com.next.genshinflow.application.user.controller;
 
+import com.next.genshinflow.application.BasePageResponse;
 import com.next.genshinflow.application.post.dto.PostResponse;
 import com.next.genshinflow.application.user.dto.member.ChangePasswordRequest;
 import com.next.genshinflow.application.user.dto.member.ChangeUidRequest;
@@ -38,7 +39,7 @@ public interface MemberAPI {
         description = "bearerAuth = User, Admin / size = 10",
         security = @SecurityRequirement(name = "bearerAuth")
     )
-    ResponseEntity<List<PostResponse>> getMyPosts(
+    ResponseEntity<BasePageResponse<PostResponse>> getMyPosts(
         @Positive @RequestParam(value = "page", defaultValue = "1") int page,
         @Positive @RequestParam(value = "size", defaultValue = "10") int size
     );

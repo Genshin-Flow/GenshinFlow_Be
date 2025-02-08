@@ -1,5 +1,6 @@
 package com.next.genshinflow.application.report.service;
 
+import com.next.genshinflow.application.BasePageResponse;
 import com.next.genshinflow.application.report.dto.*;
 import com.next.genshinflow.application.report.mapper.ReportMapper;
 import com.next.genshinflow.application.EntityFinder;
@@ -38,29 +39,50 @@ public class ReportService {
     }
 
     // 모든 신고 내역 조회
-    public Page<ReportResponse> getAllReports(int page, int size) {
+    public BasePageResponse<ReportResponse> getAllReports(int page, int size) {
         Pageable pageable = createPageable(page, size);
         Page<ReportEntity> historyPage = reportRepository.findAll(pageable);
 
-        return historyPage.map(ReportMapper::toResponse);
+        Page<ReportResponse> reportResponsePage = historyPage.map(ReportMapper::toResponse);
+        return new BasePageResponse<>(
+            reportResponsePage.getContent(),
+            reportResponsePage.getNumber() + 1,
+            reportResponsePage.getSize(),
+            reportResponsePage.getTotalElements(),
+            reportResponsePage.getTotalPages()
+        );
     }
 
     // 상태별 신고 내역 조회
-    public Page<ReportResponse> getReportsByStatus(String status, int page, int size) {
+    public BasePageResponse<ReportResponse> getReportsByStatus(String status, int page, int size) {
         Pageable pageable = createPageable(page, size);
 
         ReportStatus reportStatus = ReportStatus.fromString(status);
         Page<ReportEntity> historyPage = reportRepository.findByReportStatus(reportStatus, pageable);
 
-        return historyPage.map(ReportMapper::toResponse);
+        Page<ReportResponse> reportResponsePage =  historyPage.map(ReportMapper::toResponse);
+        return new BasePageResponse<>(
+            reportResponsePage.getContent(),
+            reportResponsePage.getNumber() + 1,
+            reportResponsePage.getSize(),
+            reportResponsePage.getTotalElements(),
+            reportResponsePage.getTotalPages()
+        );
     }
 
     // 유저 신고 내역 조회
-    public Page<ReportResponse> getUserReportHistory(String userEmail, int page, int size) {
+    public BasePageResponse<ReportResponse> getUserReportHistory(String userEmail, int page, int size) {
         Pageable pageable = createPageable(page, size);
         Page<ReportEntity> historyPage = reportRepository.findByTargetUser_Email(userEmail, pageable);
 
-        return historyPage.map(ReportMapper::toResponse);
+        Page<ReportResponse> reportResponsePage =  historyPage.map(ReportMapper::toResponse);
+        return new BasePageResponse<>(
+            reportResponsePage.getContent(),
+            reportResponsePage.getNumber() + 1,
+            reportResponsePage.getSize(),
+            reportResponsePage.getTotalElements(),
+            reportResponsePage.getTotalPages()
+        );
     }
 
     private Pageable createPageable(int page, int size) {
