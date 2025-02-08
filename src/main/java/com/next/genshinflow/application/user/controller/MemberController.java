@@ -1,5 +1,6 @@
 package com.next.genshinflow.application.user.controller;
 
+import com.next.genshinflow.application.BasePageResponse;
 import com.next.genshinflow.application.post.dto.PostResponse;
 import com.next.genshinflow.application.user.dto.member.ChangePasswordRequest;
 import com.next.genshinflow.application.user.dto.member.ChangeUidRequest;
@@ -37,12 +38,12 @@ public class MemberController implements MemberAPI {
 
     @GetMapping("/my-post")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<List<PostResponse>> getMyPosts(
+    public ResponseEntity<BasePageResponse<PostResponse>> getMyPosts(
         @Positive @RequestParam(value = "page", defaultValue = "1") int page,
         @Positive @RequestParam(value = "size", defaultValue = "10") int size
     ) {
-        Page<PostResponse> postHistory = memberService.getMyPosts(page, size);
-        return ResponseEntity.ok(postHistory.getContent());
+        BasePageResponse<PostResponse> postHistory = memberService.getMyPosts(page-1, size);
+        return ResponseEntity.ok(postHistory);
     }
 
     @PatchMapping("/update/uid")

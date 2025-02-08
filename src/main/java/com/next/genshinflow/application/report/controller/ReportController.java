@@ -1,5 +1,6 @@
 package com.next.genshinflow.application.report.controller;
 
+import com.next.genshinflow.application.BasePageResponse;
 import com.next.genshinflow.application.report.dto.*;
 import com.next.genshinflow.application.report.service.ReportService;
 import com.next.genshinflow.domain.user.entity.Discipline;
@@ -31,33 +32,33 @@ public class ReportController implements ReportAPI {
 
     @GetMapping("/report/history")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<List<ReportResponse>> getAllReports(
+    public ResponseEntity<BasePageResponse<ReportResponse>> getAllReports(
         @Positive @RequestParam(value = "page", defaultValue = "1") int page,
         @Positive @RequestParam(value = "size", defaultValue = "15") int size
     ) {
-        Page<ReportResponse> reportHistory = reportService.getAllReports(page-1, size);
-        return ResponseEntity.ok(reportHistory.getContent());
+        BasePageResponse<ReportResponse> reportHistory = reportService.getAllReports(page-1, size);
+        return ResponseEntity.ok(reportHistory);
     }
 
     @GetMapping("/report/history/{status}")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<List<ReportResponse>> getReportsByStatus(
+    public ResponseEntity<BasePageResponse<ReportResponse>> getReportsByStatus(
         @PathVariable String status,
         @Positive @RequestParam(value = "page", defaultValue = "1") int page,
         @Positive @RequestParam(value = "size", defaultValue = "15") int size
     ) {
-        Page<ReportResponse> reportHistory = reportService.getReportsByStatus(status, page-1, size);
-        return ResponseEntity.ok(reportHistory.getContent());
+        BasePageResponse<ReportResponse> reportHistory = reportService.getReportsByStatus(status, page-1, size);
+        return ResponseEntity.ok(reportHistory);
     }
 
     @GetMapping("/report/{userEmail}/history")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<List<ReportResponse>> getUserReportHistory(
+    public ResponseEntity<BasePageResponse<ReportResponse>> getUserReportHistory(
         @PathVariable String userEmail,
         @Positive @RequestParam(value = "page", defaultValue = "1") int page,
         @Positive @RequestParam(value = "size", defaultValue = "20") int size
     ) {
-        Page<ReportResponse> reportHistory = reportService.getUserReportHistory(userEmail, page-1, size);
-        return ResponseEntity.ok(reportHistory.getContent());
+        BasePageResponse<ReportResponse> reportHistory = reportService.getUserReportHistory(userEmail, page-1, size);
+        return ResponseEntity.ok(reportHistory);
     }
 }

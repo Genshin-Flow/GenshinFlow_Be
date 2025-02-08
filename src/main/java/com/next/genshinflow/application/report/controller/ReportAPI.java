@@ -1,5 +1,6 @@
 package com.next.genshinflow.application.report.controller;
 
+import com.next.genshinflow.application.BasePageResponse;
 import com.next.genshinflow.application.report.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -11,7 +12,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.List;
 
 @Tag(name = "Report", description = "유저 신고 관련 API")
 public interface ReportAPI {
@@ -27,7 +27,7 @@ public interface ReportAPI {
         description = "bearerAuth = Admin / size = 15",
         security = @SecurityRequirement(name = "bearerAuth")
     )
-    ResponseEntity<List<ReportResponse>> getAllReports(
+    ResponseEntity<BasePageResponse<ReportResponse>> getAllReports(
         @Positive @RequestParam(value = "page", defaultValue = "1") int page,
         @Positive @RequestParam(value = "size", defaultValue = "15") int size
     );
@@ -37,7 +37,7 @@ public interface ReportAPI {
         description = "bearerAuth = Admin / status = PROCESSED(NO_ACTION_NEEDED), UNPROCESSED / size = 15",
         security = @SecurityRequirement(name = "bearerAuth")
     )
-    ResponseEntity<List<ReportResponse>> getReportsByStatus(
+    ResponseEntity<BasePageResponse<ReportResponse>> getReportsByStatus(
         @PathVariable String status,
         @Positive @RequestParam(value = "page", defaultValue = "1") int page,
         @Positive @RequestParam(value = "size", defaultValue = "15") int size
@@ -48,7 +48,7 @@ public interface ReportAPI {
         description = "bearerAuth = Admin / size = 20",
         security = @SecurityRequirement(name = "bearerAuth")
     )
-    ResponseEntity<List<ReportResponse>> getUserReportHistory(
+    ResponseEntity<BasePageResponse<ReportResponse>> getUserReportHistory(
         @PathVariable String userEmail,
         @Positive @RequestParam(value = "page", defaultValue = "1") int page,
         @Positive @RequestParam(value = "size", defaultValue = "20") int size

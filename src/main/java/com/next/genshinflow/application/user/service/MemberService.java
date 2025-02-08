@@ -1,5 +1,6 @@
 package com.next.genshinflow.application.user.service;
 
+import com.next.genshinflow.application.BasePageResponse;
 import com.next.genshinflow.application.EntityFinder;
 import com.next.genshinflow.application.post.dto.PostResponse;
 import com.next.genshinflow.application.post.mapper.PostMapper;
@@ -54,12 +55,19 @@ public class MemberService {
     }
 
     // 내 게시물 조회
-    public Page<PostResponse> getMyPosts(int page, int size) {
+    public BasePageResponse<PostResponse> getMyPosts(int page, int size) {
         MemberEntity member = entityFinder.getCurrentMember();
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
         Page<PostEntity> historyPage = postRepository.findByWriter_Id(member.getId(), pageable);
 
-        return historyPage.map(PostMapper::toResponse);
+        Page<PostResponse> postResponsePage = historyPage.map(PostMapper::toResponse);
+        return new BasePageResponse<>(
+            postResponsePage.getContent(),
+            postResponsePage.getNumber() + 1,
+            postResponsePage.getSize(),
+            postResponsePage.getTotalElements(),
+            postResponsePage.getTotalPages()
+        );
     }
 
     public MemberResponse updateUid(ChangeUidRequest request) {
