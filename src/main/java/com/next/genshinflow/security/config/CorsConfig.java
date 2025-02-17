@@ -8,12 +8,16 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 @Configuration
 public class CorsConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of(
+                "genshin-flow-git-fix-casesensitive-fefdfea1s-projects.vercel.app"
+        ));
         configuration.addAllowedOriginPattern("*"); // 모든 출처 허용
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "PUT", "DELETE"));
         configuration.setAllowedHeaders(Collections.singletonList("*")); // 모든 헤더 허용
