@@ -16,7 +16,8 @@ public class CorsConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(
-                "genshin-flow-git-fix-casesensitive-fefdfea1s-projects.vercel.app"
+                "genshin-flow-git-fix-casesensitive-fefdfea1s-projects.vercel.app",
+                "genshinflow-git-develop-fefdfea1s-projects.vercel.app"
         ));
         configuration.addAllowedOriginPattern("*"); // 모든 출처 허용
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "PUT", "DELETE"));
